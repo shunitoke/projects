@@ -3,7 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OLEG.EXE: Program Manager</title>
+<title>Олег Шпарбер — инженер ИИ-систем</title>
+<meta name="description" content="Сайты, приложения, боты и интеграции, где ИИ не выдумывает факты. Клиентские кейсы: LeChill, Пять углов. Продукты: СПРУТ, ГАЗЛАЙТ, Программа 21 в RuStore.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OLEG.EXE">
+<meta property="og:url" content="https://gigoctopus.ru/me/">
+<meta property="og:title" content="Олег Шпарбер — инженер ИИ-систем">
+<meta property="og:description" content="Сайты, приложения, боты и интеграции, где ИИ не выдумывает факты. 9 136 событий в афише, живые клиенты, два приложения в RuStore.">
+<meta property="og:image" content="https://gigoctopus.ru/me/assets/og-preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Рабочий стол в стиле Windows 3.1 с проектами Олега Шпарбера">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Олег Шпарбер — инженер ИИ-систем">
+<meta name="twitter:description" content="Сайты, приложения, боты и интеграции, где ИИ не выдумывает факты.">
+<meta name="twitter:image" content="https://gigoctopus.ru/me/assets/og-preview.jpg">
+<meta name="theme-color" content="#008080">
 <style>
   :root{
     --gray:#c0c0c0;
@@ -1372,6 +1387,9 @@ function openProject(id) {
       <dt>${labelDone}</dt><dd><ul style="margin:2px 0 0;padding-left:18px">${facts}</ul></dd>
     </dl>
     ${links}
+    <div style="margin-top:7px">
+      <button class="btn" type="button" onclick="caseLink('${id}')">Скопировать ссылку на кейс</button>
+    </div>
     ${screens || shot}
     ${video}
     ${gallery}
@@ -1691,7 +1709,8 @@ const CLIPPY_ASIDE = {
   spam:    'Хватит. У меня тоже есть чувства.',
   top:     'Наверх. Там ничего нового, но красиво.',
   archiveItem: 'Лежит в архиве. Не потому что плохой, просто 1997-й закончился.',
-  persimmon: 'Хурма? Я предпочитаю скрепки. Но тест прошёл. Дважды.'
+  persimmon: 'Хурма? Я предпочитаю скрепки. Но тест прошёл. Дважды.',
+  copied: 'Ссылка скопирована. Кидайте, я не против.'
 };
 
 const clippyImg = document.getElementById('clippy-img');
@@ -1800,6 +1819,31 @@ if (clippyImg && clippySay) {
     if (!nearEnd) saidBottom = false;
   }, { passive: true });
 }
+
+// ── ссылка на конкретный кейс: /me/#spurt ──
+function openFromHash() {
+  const id = decodeURIComponent(location.hash.replace(/^#/, ''));
+  if (!id) return;
+  if (PROJECTS[id]) openProject(id);
+  else if (FOLDERS[id]) openFolder(id);
+  else if (id === 'archive') openArchive();
+}
+
+function caseLink(id) {
+  const url = location.origin + location.pathname + '#' + id;
+  const done = () => { if (window.clippyReact) window.clippyReact('copied'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done, () => { window.prompt('Скопируйте ссылку', url); });
+  } else {
+    window.prompt('Скопируйте ссылку', url);
+  }
+}
+
+if (location.hash) {
+  // ждём, пока отрисуется сетка, иначе модалка откроется в пустоту
+  setTimeout(openFromHash, 60);
+}
+window.addEventListener('hashchange', openFromHash);
 
 // clock
 function tick(){
