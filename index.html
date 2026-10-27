@@ -1230,6 +1230,7 @@ const oldCount = FOLDERS.old.items.length;
 addIcon(petWrap, 'folder-old', FOLDER_SVG, 'OLD', `папка · ${oldCount} файла`, () => openFolder('old'));
 
 function openFolder(fid) {
+  if (window.clippyReact) window.clippyReact(fid);
   const f = FOLDERS[fid];
   if (!f) return;
   document.getElementById('mtitle').textContent = f.title;
@@ -1269,6 +1270,7 @@ function openFolder(fid) {
 }
 
 function openArchive() {
+  if (window.clippyReact) window.clippyReact('old');
   document.getElementById('mtitle').textContent = 'ARCHIVE.TXT — Блокнот';
   document.getElementById('mcontent').innerHTML =
     `<pre class="archive">${ARCHIVE_TEXT.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre>`;
@@ -1333,6 +1335,8 @@ function openProject(id) {
     ${gallery}
     <div class="warn" style="margin-top:8px">${p.note}</div>
   `;
+  if (window.clippyReact) window.clippyReact(id, p.inFolder ? 'archiveItem' : null);
+
   document.querySelectorAll('#mcontent .thumb').forEach(btn => {
     btn.addEventListener('click', () => {
       const main = document.getElementById('screen-main');
@@ -1399,13 +1403,17 @@ document.addEventListener('keydown', e => {
   }
 });
 
-function bsod(){ document.getElementById('bsod').classList.add('on'); }
+function bsod(){
+  document.getElementById('bsod').classList.add('on');
+  if (window.clippyReact) window.clippyReact('bsod');
+}
 
 // ── меню ──
 document.querySelectorAll('.menubar button').forEach(btn => {
   btn.addEventListener('click', () => {
     const act = btn.dataset.menu;
     if (act === 'cv') {
+      if (window.clippyReact) window.clippyReact('cv');
       window.open('assets/CV_Oleg_Sparber.pdf', '_blank');
     } else if (act === 'projects') {
       document.getElementById('icons-work')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1483,51 +1491,136 @@ const CLIPPY_LINES = [
   'Если ИИ уверен на 100%, проверьте дважды.',
   'Хотите, я помогу закрыть окно? Нет? Ладно, посижу.'
 ];
+// что скрепыш говорит, когда смотрит на конкретный проект
+const CLIPPY_ON_PROJECT = {
+  spurt:      '9 136 событий, и ни одно не выдумано. Я бы так не смог.',
+  gaslight:   'Разбирает манипуляции по цитатам. В 1997-м мне такого не хватало.',
+  vibejob:    'Ищет работу за тебя. Мне бы пригодилось в 2001-м.',
+  p21:        'Дневник шифрует. Мой дневник читали все.',
+  five:       'Газета. Я помню времена, когда их было много.',
+  lechill:    'Записываются онлайн. Раньше звонили. Прогресс.',
+  cam:        'Камера и MIDI. Я умею только скрепки.',
+  stamps:     '2 103 предмета. У меня одна скрепка. Зато своя.',
+  liferandom: 'Решает за тебя. Опасно. Давай.',
+  old:        'Архив. Почти мой ровесник.'
+};
+
+const CLIPPY_ASIDE = {
+  cv:      'Резюме скачано. Теперь твой ход, HR.',
+  visitka: 'Визитку в типографию. Вылеты я проверил.',
+  bsod:    'Я предупреждал: вайб-кодер не найден.',
+  idle:    'Вы там работаете или как? Я не осуждаю. Просто спрашиваю.',
+  bottom:  'Досмотрели до конца. Уважаю.',
+  spam:    'Хватит. У меня тоже есть чувства.',
+  top:     'Наверх. Там ничего нового, но красиво.',
+  archiveItem: 'Лежит в архиве. Не потому что плохой, просто 1997-й закончился.'
+};
+
 const clippyImg = document.getElementById('clippy-img');
 const clippySay = document.getElementById('clippy-say');
 if (clippyImg && clippySay) {
   let ci = 0;
+  let lastShown = 0;
+  let clicks = 0;
+  let clickTimer = null;
+  let typed = null;
 
   const narrow = window.matchMedia('(max-width:700px)');
+  const calm = window.matchMedia('(prefers-reduced-motion:reduce)');
   let hideTimer = null;
 
-  const speak = (idx, animate) => {
-    clippySay.innerHTML = '<b>Скрепыш</b>' + CLIPPY_LINES[idx];
+  const paint = (text, animate) => {
+    clearInterval(typed);
+    if (!animate || calm.matches) {
+      clippySay.innerHTML = '<b>Скрепыш</b>' + text;
+      return;
+    }
+    // печатная машинка: реплика набирается, как в 1997-м
+    clippySay.innerHTML = '<b>Скрепыш</b><span id="clippy-type"></span>';
+    const box = document.getElementById('clippy-type');
+    let i = 0;
+    typed = setInterval(() => {
+      i += 1;
+      box.textContent = text.slice(0, i);
+      if (i >= text.length) clearInterval(typed);
+    }, 16);
+  };
+
+  const show = (text, animate) => {
     clippySay.classList.remove('mute');
-    if (animate) {
+    paint(text, animate !== false);
+    if (animate !== false) {
       clippySay.classList.remove('speaking');
       clippyImg.classList.remove('bob-fast');
       void clippySay.offsetWidth;      // перезапуск анимации
       clippySay.classList.add('speaking');
       clippyImg.classList.add('bob-fast');
     }
-    // на телефоне реплика не висит поверх карточек постоянно
+    lastShown = Date.now();
     clearTimeout(hideTimer);
     if (narrow.matches) {
       hideTimer = setTimeout(() => clippySay.classList.add('mute'), 7000);
     }
   };
 
+  // наружу: реакции на действия пользователя
+  window.clippyReact = (key, fallback) => {
+    const line = CLIPPY_ON_PROJECT[key] || CLIPPY_ASIDE[key] || (fallback && CLIPPY_ASIDE[fallback]);
+    if (line) show(line);
+  };
+
   clippyImg.addEventListener('click', () => {
+    clicks += 1;
+    clearTimeout(clickTimer);
+    // пять кликов подряд — получаешь по рукам
+    if (clicks >= 5) { clicks = 0; show(CLIPPY_ASIDE.spam); return; }
+    clickTimer = setTimeout(() => { clicks = 0; }, 2500);
     ci = (ci + 1) % CLIPPY_LINES.length;
-    speak(ci, true);
+    show(CLIPPY_LINES[ci]);
   });
 
-  // скрепыш сам меняет реплики, чтобы не молчал ни на десктопе, ни на телефоне
-  let nextLine = () => {
+  const nextLine = () => {
+    // не перебиваем реакцию на действие ближайшие 9 секунд
+    if (Date.now() - lastShown < 9000) return;
     let n = ci;
     while (n === ci && CLIPPY_LINES.length > 1) {
       n = Math.floor(Math.random() * CLIPPY_LINES.length);
     }
     ci = n;
-    speak(ci, true);
+    show(CLIPPY_LINES[ci]);
   };
-  speak(0, false);          // первая реплика тоже должна гаснуть на телефоне
+
+  show(CLIPPY_LINES[0], false);
   setInterval(nextLine, 13000);
-  // и обязательно подаёт голос, когда вкладку вернули
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) nextLine();
   });
+
+  // ушли с вкладки — заметит; вернулись — прокомментирует
+  let awayTimer = null;
+  document.addEventListener('visibilitychange', () => {
+    clearTimeout(awayTimer);
+    if (document.hidden) return;
+    awayTimer = setTimeout(() => show('С возвращением. Я всё видел.'), 800);
+  });
+
+  // долгое бездействие
+  let idle = null;
+  const wake = () => {
+    clearTimeout(idle);
+    idle = setTimeout(() => show(CLIPPY_ASIDE.idle), 75000);
+  };
+  ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'].forEach(ev =>
+    document.addEventListener(ev, wake, { passive: true }));
+  wake();
+
+  // докрутили до самого низа
+  let saidBottom = false;
+  window.addEventListener('scroll', () => {
+    const nearEnd = window.scrollY + window.innerHeight >= document.body.scrollHeight - 40;
+    if (nearEnd && !saidBottom) { saidBottom = true; show(CLIPPY_ASIDE.bottom); }
+    if (!nearEnd) saidBottom = false;
+  }, { passive: true });
 }
 
 // clock
