@@ -362,6 +362,35 @@
     background:#000;
     border:1px solid #000;
   }
+  .vwrap{position:relative;display:flex;justify-content:center;max-width:100%;margin:0 auto}
+  .vwrap .vctl{
+    position:absolute;right:7px;top:7px;display:flex;gap:5px;
+    opacity:0;transition:opacity .15s;z-index:2;
+  }
+  .vwrap:hover .vctl,.vwrap:fullscreen .vctl,.vctl:focus-within{opacity:1}
+  .vexp{
+    width:26px;height:26px;padding:0;line-height:1;font-size:13px;cursor:pointer;
+    background:var(--gray);color:var(--ink);
+    border-top:2px solid var(--light);border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  }
+  .vexp:active{border-color:var(--ink) var(--light) var(--light) var(--ink)}
+  /* крестик существует только в полноэкранном режиме */
+  .vclose{
+    display:none;
+    position:absolute;right:14px;top:14px;z-index:3;
+    width:34px;height:34px;padding:0;line-height:1;
+    font-size:20px;font-weight:bold;cursor:pointer;
+    background:var(--gray);color:var(--ink);
+    border-top:2px solid var(--light);border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  }
+  .vclose:hover{background:#d8d8d8}
+  .vclose:active{border-color:var(--ink) var(--light) var(--light) var(--ink)}
+  .vwrap:fullscreen{background:#000;align-items:center;max-width:none;width:100%;height:100%}
+  .vwrap:fullscreen .vclose{display:block}
+  .vwrap:fullscreen .vctl{display:none}   /* разворачивать уже нечего */
+  .vwrap:fullscreen .clip{max-height:100%;max-width:100%;border:0}
   .clipbox{
     margin-top:8px;
     border-top:1px solid var(--shadow);
@@ -1361,7 +1390,11 @@ function openProject(id) {
 
   const video = p.video
     ? `<figure class="clipbox">
-         <video class="clip" src="${p.video}" autoplay loop muted playsinline controls preload="metadata"></video>
+         <div class="vwrap">
+           <video class="clip" src="${p.video}" autoplay loop muted playsinline controls preload="metadata"></video>
+           <span class="vctl"><button class="vexp" type="button" title="На весь экран" aria-label="Развернуть видео на весь экран">⛶</button></span>
+           <button class="vclose" type="button" title="Закрыть (Esc)" aria-label="Выйти из полноэкранного режима">×</button>
+         </div>
          <figcaption>${p.videoCap || 'Видео-демо'}</figcaption>
        </figure>`
     : '';
@@ -1396,6 +1429,27 @@ function openProject(id) {
     <div class="warn" style="margin-top:8px">${p.note}</div>
   `;
   if (window.clippyReact) window.clippyReact(id, p.inFolder ? 'archiveItem' : null);
+
+  // видео: разворот на весь экран и крестик для выхода
+  document.querySelectorAll('#mcontent .vwrap').forEach(wrap => {
+    const expand = wrap.querySelector('.vexp');
+    const close = wrap.querySelector('.vclose');
+    const vid = wrap.querySelector('video');
+
+    const goFull = () => {
+      if (wrap.requestFullscreen) wrap.requestFullscreen().catch(() => {});
+      else if (vid && vid.webkitEnterFullscreen) vid.webkitEnterFullscreen();  // iOS
+    };
+    const exit = () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
+    };
+
+    if (expand) expand.addEventListener('click', e => { e.preventDefault(); goFull(); });
+    if (close) close.addEventListener('click', e => { e.preventDefault(); exit(); });
+    // двойной клик по видео — тоже развернуть
+    if (vid) vid.addEventListener('dblclick', goFull);
+  });
 
   document.querySelectorAll('#mcontent .thumb').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1437,6 +1491,9 @@ function closeProject() {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    // сначала выходим из полноэкранного видео — карточку не закрываем
+    if (document.fullscreenElement) { document.exitFullscreen(); return; }
+    if (document.webkitFullscreenElement) { document.webkitExitFullscreen(); return; }
     closeProject();
     document.getElementById('bsod').classList.remove('on');
     return;
