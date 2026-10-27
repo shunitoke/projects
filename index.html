@@ -874,12 +874,12 @@ const PROJECTS = {
     group: 'pet',
     title: 'ХУРМА.EXE',
     name: 'ЛЮБИТЕ ЛИ ВЫ ХУРМУ?',
-    what: 'Тест из 2018 года, найденный в интернете: четыре вопроса, три варианта ответа, ни одного осмысленного.',
+    what: 'Шуточный тест осени 2006 года: четыре вопроса, три варианта ответа, ни одного осмысленного. По сети гуляет картинкой.',
     stack: 'Абсурд · один HTML · ноль зависимостей',
     facts: [
       'Четыре вопроса и три варианта: А, Б и В, который иногда равен А',
       'Подсчёт ответов и честное подведение итогов',
-      'Оригинал 2018 года можно посмотреть, не выходя из карточки'
+      'Оригинал 2006 года можно посмотреть, не выходя из карточки'
     ],
     note: 'Тест не измеряет ничего. Как и большинство тестов.',
     quiz: true
@@ -1611,7 +1611,7 @@ function openQuiz() {
       <div class="quiztally">
         ${counts.map((c, i) => `<span class="${i === winner ? 'win' : ''}">${LETTERS[i]}: ${c}</span>`).join('')}
       </div>
-      <div class="warn">Оригинал 2018 года. Вопрос 4 там действительно такой.</div>
+      <div class="warn">Оригинал осени 2006-го. Вопрос 4 там действительно такой.</div>
       <div class="quizbtns">
         <button class="btn" type="button" id="quiz-again">Пройти заново</button>
         <button class="btn" type="button" id="quiz-orig-btn">Оригинал</button>
@@ -1627,7 +1627,7 @@ function openQuiz() {
     document.getElementById('quiz-orig-btn').addEventListener('click', () => {
       showOriginal = !showOriginal;
       document.getElementById('quiz-orig').innerHTML = showOriginal
-        ? `<figure class="shot"><img src="assets/persimmon.webp" alt="Оригинальный тест 2018 года" loading="lazy"><figcaption>Первоисточник: картинка 2018 года. Текст в ней с опечатками, но смысл сохранён.</figcaption></figure>`
+        ? `<figure class="shot"><img src="assets/persimmon.webp" alt="Оригинальный тест 2006 года" loading="lazy"><figcaption>Первоисточник: та самая картинка, гуляет по сети с осени 2006-го. Текст с опечатками, смысл сохранён.</figcaption></figure>`
         : '';
     });
 
