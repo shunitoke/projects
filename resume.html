@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Олег Шпарбер — инженер ИИ-систем</title>
+<style>
+  @page { size: A4; margin: 14mm 15mm 12mm 15mm; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body{
+    font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+    font-size: 9.6pt;
+    line-height: 1.42;
+    color: #14202b;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── шапка ── */
+  .head{
+    border-bottom: 2.2pt solid #0f3f4f;
+    padding-bottom: 7pt;
+    margin-bottom: 10pt;
+  }
+  .name{
+    font-size: 23pt;
+    font-weight: 700;
+    letter-spacing: .02em;
+    margin: 0;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .role{
+    font-size: 11.4pt;
+    font-weight: 600;
+    color: #0f3f4f;
+    margin: 3pt 0 0;
+  }
+  .contacts{
+    margin-top: 5pt;
+    font-size: 9pt;
+    color: #33424f;
+    line-height: 1.55;
+  }
+  .contacts span{ white-space: nowrap; }
+  .contacts .sep{ color: #9aa8b4; padding: 0 4pt; }
+
+  /* ── секции ── */
+  h2{
+    font-size: 9.4pt;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #0f3f4f;
+    margin: 12pt 0 5pt;
+    padding-bottom: 2.5pt;
+    border-bottom: .6pt solid #c3ced6;
+    font-weight: 700;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  p{ margin: 0 0 5pt; }
+  .lead{ margin-bottom: 2pt; }
+
+  /* ── проекты ── */
+  .proj{ margin-bottom: 7.5pt; page-break-inside: avoid; }
+  .proj .t{ font-weight: 700; font-size: 10pt; }
+  .proj .t .url{
+    font-weight: 400;
+    color: #4a5f6e;
+    font-size: 8.6pt;
+    padding-left: 4pt;
+  }
+  .proj .d{ margin: 1pt 0 0; color: #24333f; }
+  .proj .m{
+    margin: 2pt 0 0;
+    font-size: 8.8pt;
+    color: #5b6b78;
+  }
+  .proj .m b{ color: #0f3f4f; font-weight: 600; }
+
+  /* ── опыт ── */
+  .job{ margin-bottom: 7pt; page-break-inside: avoid; }
+  .job .top{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8pt;
+  }
+  .job .role-t{ font-weight: 700; font-size: 10pt; }
+  .job .dates{
+    font-size: 8.6pt;
+    color: #5b6b78;
+    white-space: nowrap;
+  }
+  .job .co{ font-size: 9pt; color: #4a5f6e; margin-bottom: 2pt; }
+  ul{ margin: 0; padding-left: 12pt; }
+  li{ margin-bottom: 1.5pt; }
+  li::marker{ color: #7d8f9c; }
+
+  /* ── навыки ── */
+  .skills{ display: grid; grid-template-columns: 33mm 1fr; gap: 3pt 6pt; }
+  .skills dt{ font-size: 8.8pt; color: #5b6b78; text-transform: uppercase; letter-spacing: .04em; }
+  .skills dd{ margin: 0; }
+
+  .edu{ display: grid; grid-template-columns: 1fr; gap: 2pt; }
+  .edu .e .y{ color: #5b6b78; font-size: 8.8pt; }
+
+  .foot{
+    margin-top: 10pt;
+    padding-top: 5pt;
+    border-top: .6pt solid #c3ced6;
+    font-size: 8.4pt;
+    color: #5b6b78;
+    display: flex;
+    justify-content: space-between;
+  }
+  .nb{ font-size: 8.8pt; color: #5b6b78; margin-top: 3pt; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1 class="name">Олег Шпарбер</h1>
+  <div class="role">AI-инженер: внедрение ИИ, автоматизация, сайты и приложения</div>
+  <div class="contacts">
+    <div>Санкт-Петербург · удалённо<span class="sep">·</span>+7 (920) 111-99-54<span class="sep">·</span>shunitoke@gmail.com</div>
+    <div>Telegram @osparber<span class="sep">·</span>портфолио gigoctopus.ru/me</div>
+  </div>
+</div>
+
+<h2>О себе</h2>
+<p class="lead">Собираю работающие ИИ-системы, а не демки. Двенадцать лет держал инфраструктуру живой — корпоративные среды на 10 000+ хостов, uptime 99,5%. Последние два года делаю то же самое с LLM: боты, интеграции, парсинг, автоматизация.</p>
+<p>Сильная сторона — довести до продакшена: чтобы система не&nbsp;врала, не&nbsp;падала и работала без&nbsp;меня. В своих проектах применяю принцип fail-closed: если факт не подтверждён первоисточником, он не попадает в результат. То же правило использую в работе с ИИ — модель не&nbsp;должна выдумывать данные.</p>
+
+<h2>Проекты</h2>
+
+<div class="proj">
+  <div class="t">СПРУТ — афиша Петербурга <span class="url">gigoctopus.ru</span></div>
+  <p class="d">Читает Telegram-каналы площадок, LLM извлекает события, каждое поле проверяется по первоисточнику. Не подтвердилось — не попадает в афишу.</p>
+  <p class="m"><b>9 136 событий · 141 источник · 73 площадки</b> · шесть поверхностей: канал, mini app, сайт, голосовой бот, стейдж, админка · Python, SQLite, Telethon, GigaChat, systemd на своём VPS</p>
+</div>
+
+<div class="proj">
+  <div class="t">Texts with My Ex — анализ переписки <span class="url">textswithmyex.app</span></div>
+  <p class="d">ИИ разбирает экспорт чата и показывает приёмы манипуляции: мультимодально — текст, изображения, стикеры, голосовые с транскрипцией. Без аккаунтов, данные живут только на время анализа.</p>
+  <p class="m"><b>7 форматов импорта · 6 языков · оплата Paddle · тесты Playwright</b> · Next.js 16, React 19, TypeScript, GigaChat vision, Vercel Blob, Redis</p>
+</div>
+
+<div class="proj">
+  <div class="t">Программа 21 — приложение в RuStore <span class="url">com.programma21.app</span></div>
+  <p class="d">Приватный тренер привычек и практик: heatmap прогресса, серии, дневник с локальным шифрованием AES-GCM. Серверов нет, работает офлайн.</p>
+  <p class="m"><b>опубликовано в RuStore · офлайн-режим</b> · Next.js, React, TypeScript, Capacitor</p>
+</div>
+
+<div class="proj">
+  <div class="t">vibejob — поиск работы на естественном языке <span class="url">github.com/shunitoke/llmjobparser</span></div>
+  <p class="d">Desktop-приложение: описываешь желаемую работу словами — получаешь подборку вакансий с объяснением от нейросети. Автовыбор самой дешёвой рабочей модели у провайдера.</p>
+  <p class="m"><b>десятки источников · GigaChat, OpenAI, Claude, DeepSeek, Gemini</b> · Python, FastAPI, Tauri, React · сборки для Windows и Linux</p>
+</div>
+
+<div class="proj">
+  <div class="t">Cam Techno — камера как инструмент</div>
+  <p class="d">Браузерный техно-инструмент: вебкамера распознаёт две руки, жесты управляют генератором ритма и реактивной графикой в реальном времени.</p>
+  <p class="m"><b>300+ FPS · трекинг рук в браузере · Web MIDI</b> · JavaScript, MediaPipe, Web Audio / AudioWorklet, Three.js</p>
+</div>
+
+<div class="proj">
+  <div class="t">Каталог марок и монет — реестр с ИИ-идентификацией</div>
+  <p class="d">Реестр коллекции с определением страны, года, каталожного номера и оценки. Реестры и фотографии — источник истины, интерфейс ничего не меняет молча.</p>
+  <p class="m"><b>2 103 предмета (1 929 марок и 174 монеты) · 338 975 ₽ по каталогу · 4 206 фото</b> · Python, CSV, LLM-идентификация, закрытая витрина</p>
+</div>
+
+<h2>Опыт работы — 12 лет 1 месяц</h2>
+
+<div class="job">
+  <div class="top">
+    <span class="role-t">Системный администратор</span>
+    <span class="dates">окт 2024 — окт 2025</span>
+  </div>
+  <div class="co">БиАйЭй-Технолоджиз, Санкт-Петербург</div>
+  <ul>
+    <li>Автоматизация развёртывания окружений на Docker/Docker Compose и CI/CD — ручных операций и времени на настройку меньше примерно на 40%.</li>
+    <li>Внедрение практик информационной безопасности и отказоустойчивости по стандартам материнской компании в среде 10 000+ хостов.</li>
+    <li>Администрирование Jira, Confluence, Zabbix; поддержка Linux-серверов и веб-сервисов; проектирование высокодоступных решений.</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="top">
+    <span class="role-t">IT Systems Administrator (ITOps)</span>
+    <span class="dates">авг 2021 — июн 2024</span>
+  </div>
+  <div class="co">Pole To Win (международная), Бухарест, Румыния</div>
+  <ul>
+    <li>Поддержание uptime мультирегиональной инфраструктуры на уровне 99,5%+.</li>
+    <li>Внедрение GLPI для управления IT-активами — среднее время решения заявок сократилось на 25%.</li>
+    <li>Active Directory, Office 365, Windows Server и Linux, облачная инфраструктура, VMware, сеть и безопасность Cisco/Meraki; защищённый доступ для международных партнёров.</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="top">
+    <span class="role-t">Системный администратор</span>
+    <span class="dates">июл 2013 — июл 2021</span>
+  </div>
+  <div class="co">Репер НН, Нижний Новгород</div>
+  <ul>
+    <li>Построение IT-инфраструктуры с нуля для двух производственных площадок (включая чистые комнаты) и двух офисов продаж.</li>
+    <li>Поддержка 100+ пользователей в разных локациях: Windows/Linux-серверы, 1С, резервное копирование, VPN, IP-телефония, мониторинг.</li>
+    <li>Интеграция штрихкодирования GS1 на производстве; перевод 100+ пользователей на удалённую работу за две недели без остановки бизнеса.</li>
+  </ul>
+</div>
+
+<h2>Навыки</h2>
+<dl class="skills">
+  <dt>ИИ и LLM</dt>
+  <dd>GigaChat (текст + зрение), OpenAI-совместимые API, Claude, DeepSeek, Gemini; промпт-схемы, цепочки фолбэков, стриминг, контроль галлюцинаций, извлечение структурированных данных</dd>
+  <dt>Разработка</dt>
+  <dd>Python (FastAPI), TypeScript, JavaScript, Next.js, React, Node.js, Tauri, REST API</dd>
+  <dt>Данные</dt>
+  <dd>SQLite, PostgreSQL, Telethon, Playwright, дедупликация потоков, провенанс данных, CSV-реестры</dd>
+  <dt>Инфраструктура</dt>
+  <dd>Linux, Docker, Docker Compose, CI/CD, Nginx, systemd, Zabbix, резервное копирование и восстановление, VPS, VMware, Hyper-V</dd>
+  <dt>Безопасность</dt>
+  <dd>ISO/IEC 27001:2013, аудит безопасности, Active Directory, GPO, MFA, разграничение доступа</dd>
+  <dt>Языки</dt>
+  <dd>Русский — родной; английский — B2 (читаю документацию, веду переписку)</dd>
+</dl>
+
+<h2>Образование и курсы</h2>
+<div class="edu">
+  <div class="e">НИУ ВШЭ, Нижний Новгород — менеджмент, маркетинг <span class="y">· 2012</span></div>
+  <div class="e">TMS RUS — ISO/IEC 27001:2013, управление информационной безопасностью <span class="y">· 2018</span></div>
+</div>
+
+<div class="foot">
+  <span>Олег Шпарбер · портфолио: gigoctopus.ru/me</span>
+  <span>Telegram @osparber</span>
+</div>
+
+</body>
+</html>

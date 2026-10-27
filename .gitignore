@@ -1,0 +1,47 @@
+# служебные проверочные скрипты Playwright (нужны только локально)
+v*.js
+shots*.js
+camshot*.js
+glshot*.js
+glverify.js
+lazycheck.js
+measure.js
+netdiag.js
+livecheck.js
+skillshot.js
+lechill.js
+spook.js
+verify*.js
+varcheck*.js
+vfull.js
+archive-src/
+shots/
+
+# исходные тяжёлые картинки — браузер грузит webp-версии
+assets/clippy.png
+assets/clippy-248.webp
+assets/clippy-372.webp
+assets/clippy-512.webp
+assets/spurt.png
+assets/spurt-mini.png
+assets/cam.png
+assets/cam.webp
+assets/gaslight.png
+assets/gaslight-card.png
+assets/gaslight-how.png
+assets/gaslight-mobile.png
+assets/lechill.png
+assets/lr-full1.png
+assets/lr-full2.png
+assets/lr-full3.png
+assets/lr-icon.png
+assets/lr-shot1.png
+assets/lr-shot2.png
+assets/p21.png
+assets/showcase.png
+
+# системный мусор
+node_modules/
+.DS_Store
+*.log
+CV_Timofeev*

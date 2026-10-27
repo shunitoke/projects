@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Визитка · Олег Шпарбер</title>
+<style>
+  @page { size: 96mm 56mm; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gray:   #c0c0c0;
+    --light:  #ffffff;
+    --shadow: #808080;
+    --ink:    #000000;
+    --navy:   #000080;
+    --teal:   #008080;
+  }
+
+  body {
+    background: #6a6a6a;
+    font-family: 'DejaVu Sans Mono', 'Noto Sans Mono', monospace;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* 96×56 мм = 90×50 + по 3 мм вылета с каждой стороны */
+  .card {
+    width: 96mm;
+    height: 56mm;
+    background: var(--teal);      /* тил уходит под обрез (вылеты 3 мм) */
+    padding: 3mm;                 /* вылеты */
+    display: flex;
+    flex-direction: column;
+    page-break-after: always;
+    break-after: page;
+  }
+  .card:last-child { page-break-after: auto; break-after: auto; }
+
+  /* рамка окна Win98 */
+  .win {
+    flex: 1;
+    min-height: 0;                /* иначе содержимое выпирает за карточку */
+    max-height: calc(100% - 4.8mm);
+    margin: 2.4mm;                /* после обрезки 3 мм остаётся 2,4 мм тила вокруг окна */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--gray);
+    border-top: 1.2px solid var(--light);
+    border-left: 1.2px solid var(--light);
+    border-right: 1.2px solid var(--ink);
+    border-bottom: 1.2px solid var(--ink);
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--navy);
+    color: #fff;
+    padding: 0.7mm 1.4mm;
+    font-size: 6.6pt;
+    font-weight: bold;
+    letter-spacing: .02em;
+  }
+  .tb-btns { display: flex; gap: 0.8mm; }
+  .tb-btn {
+    width: 2.6mm; height: 2.6mm;
+    background: var(--gray);
+    border-top: .7px solid var(--light);
+    border-left: .7px solid var(--light);
+    border-right: .9px solid var(--ink);
+    border-bottom: .9px solid var(--ink);
+    font-size: 4.4pt;
+    line-height: 2.1mm;
+    text-align: center;
+    color: var(--ink);
+    font-weight: bold;
+  }
+
+  .content {
+    flex: 1;
+    min-height: 0;
+    background: #f4f4f4;
+    margin: 1.2mm;
+    padding: 2mm 2.4mm 4mm;
+    border-top: 1px solid var(--shadow);
+    border-left: 1px solid var(--shadow);
+    border-right: 1px solid var(--light);
+    border-bottom: 1px solid var(--light);
+    display: flex;
+    gap: 2.6mm;
+    overflow: hidden;
+  }
+
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .col-qr { flex: 0 0 auto; width: 16.5mm; padding-right: 0.6mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1mm; }
+
+  .name {
+    font-family: 'DejaVu Sans', sans-serif;
+    font-size: 12.4pt;
+    font-weight: bold;
+    letter-spacing: -.01em;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .role {
+    font-size: 7pt;
+    color: var(--teal);
+    font-weight: bold;
+    margin-top: 0.9mm;
+    letter-spacing: .01em;
+  }
+  .rule {
+    height: 0;
+    border-top: 1px dotted var(--shadow);
+    margin: 1.5mm 0 1.4mm;
+  }
+  .tagline {
+    font-size: 6.6pt;
+    color: #303030;
+    line-height: 1.35;
+  }
+
+  .contacts { margin-top: auto; display: flex; flex-direction: column; gap: 0.75mm; }
+  .line {
+    font-size: 6.5pt;
+    display: flex;
+    align-items: baseline;
+    gap: 1.2mm;
+    color: var(--ink);
+  }
+  .line .k {
+    color: var(--teal);
+    font-weight: bold;
+    width: 3.4mm;
+    flex: 0 0 auto;
+  }
+  .line .v { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .qr-box {
+    width: 15.4mm; height: 15.4mm;
+    background: #fff;
+    border: 1px solid var(--ink);
+    padding: 0.7mm;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qr-box img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+  .qr-cap {
+    font-size: 4.9pt;
+    color: #404040;
+    text-align: center;
+    line-height: 1.15;
+  }
+
+  /* обратная сторона */
+  .h {
+    font-size: 7pt;
+    font-weight: bold;
+    color: var(--navy);
+    letter-spacing: .04em;
+    margin-bottom: 0.7mm;
+  }
+  .h:not(:first-child) { margin-top: 1.4mm; }
+
+  ul.list { list-style: none; display: flex; flex-direction: column; gap: 0.4mm; }
+  ul.list li {
+    font-size: 6.7pt;
+    line-height: 1.28;
+    padding-left: 3mm;
+    position: relative;
+    color: #141414;
+  }
+  ul.list li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+    font-weight: bold;
+  }
+
+  ol.steps { list-style: none; display: flex; flex-direction: column; gap: 0.35mm; counter-reset: s; }
+  ol.steps li {
+    font-size: 6.4pt;
+    line-height: 1.25;
+    padding-left: 3.6mm;
+    position: relative;
+    counter-increment: s;
+    color: #141414;
+  }
+  ol.steps li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    color: var(--navy);
+  }
+
+  .foot {
+    margin-top: auto;
+    margin-bottom: 1.4mm;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2mm;
+    padding-top: 1mm;
+  }
+  .foot .say { font-size: 6pt; color: #404040; line-height: 1.3; }
+  .foot .say b { color: var(--ink); }
+  .okbtn {
+    font-size: 5.4pt;
+    background: var(--gray);
+    border-top: .8px solid var(--light);
+    border-left: .8px solid var(--light);
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 0.5mm 2mm;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  @media screen {
+    body { padding: 12mm; display: flex; flex-direction: column; gap: 8mm; align-items: center; }
+    .card { box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────── ЛИЦЕВАЯ ─────────── -->
+<div class="card">
+  <div class="win">
+    <div class="titlebar">
+      <span>OLEG.EXE — визитная карточка</span>
+      <span class="tb-btns">
+        <span class="tb-btn">□</span>
+        <span class="tb-btn">×</span>
+      </span>
+    </div>
+    <div class="content">
+      <div class="col">
+        <div class="name">Олег<br>Шпарбер</div>
+        <div class="role">инженер ИИ-систем</div>
+        <div class="rule"></div>
+        <div class="tagline">
+          Сайты, приложения, боты<br>
+          и интеграции, где ИИ<br>
+          не выдумывает факты.
+        </div>
+        <div class="contacts">
+          <div class="line"><span class="k">@</span><span class="v">shunitoke@gmail.com</span></div>
+          <div class="line"><span class="k">✈</span><span class="v">@osparber</span></div>
+          <div class="line"><span class="k">⌂</span><span class="v">gigoctopus.ru/me</span></div>
+        </div>
+      </div>
+      <div class="col-qr">
+        <div class="qr-box"><img src="assets/qr-site.png" alt="QR: портфолио"></div>
+        <div class="qr-cap">портфолио<br>и CV</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── ОБРАТНАЯ ─────────── -->
+<div class="card">
+  <div class="win">
+    <div class="titlebar">
+      <span>ЧТО-ДЕЛАЮ.TXT — и как я работаю</span>
+      <span class="tb-btns">
+        <span class="tb-btn">□</span>
+        <span class="tb-btn">×</span>
+      </span>
+    </div>
+    <div class="content">
+      <div class="col">
+        <div class="h">ЧТО ДЕЛАЮ</div>
+        <ul class="list">
+          <li>Сайты, приложения и боты под задачу</li>
+          <li>Интеграции: CRM, оплата, Telegram</li>
+          <li>Парсеры и LLM, где факты проверены</li>
+        </ul>
+
+        <div class="h">КАК РАБОТАЮ</div>
+        <ol class="steps">
+          <li>Разбираю задачу, а не техзадание</li>
+          <li>Прототип до кода</li>
+          <li>Фиксирую объём и приёмку</li>
+          <li>Отдаю доступы и документацию</li>
+        </ol>
+
+        <div class="foot">
+          <div class="okbtn">OK</div>
+        </div>
+      </div>
+      <div class="col-qr">
+        <div class="qr-box"><img src="assets/qr-tg.png" alt="QR: телеграм"></div>
+        <div class="qr-cap">телеграм<br>@osparber</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

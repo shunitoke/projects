@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OLEG.EXE: Program Manager</title>
+<style>
+  :root{
+    --gray:#c0c0c0;
+    --light:#dfdfdf;
+    --shadow:#808080;
+    --teal:#008080;
+    --navy:#000080;
+    --ink:#000;
+    --paper:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;overflow-x:hidden}
+  body{
+    background:var(--teal);
+    font-family:"MS Sans Serif",Tahoma,Geneva,Verdana,sans-serif;
+    font-size:12px;
+    line-height:1.45;
+    color:var(--ink);
+    padding:10px;
+    -webkit-font-smoothing:none;
+  }
+  @media(min-width:900px){ body{padding:18px} }
+
+  /* ── Win 3.1 chrome ───────────────────────────── */
+  .window{
+    background:var(--gray);
+    padding:3px;
+    border-top:2px solid var(--light);
+    border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+    box-shadow:inset -1px -1px 0 var(--shadow), inset 1px 1px 0 #fff;
+  }
+  .titlebar{
+    background:var(--navy);
+    color:#fff;
+    font-weight:700;
+    font-size:12px;
+    padding:2px 3px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    user-select:none;
+    cursor:default;
+  }
+  .titlebar .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tbtns{display:flex;gap:2px;flex:0 0 auto}
+  .tb{
+    width:16px;height:14px;
+    background:var(--gray);
+    border-top:1px solid var(--light);
+    border-left:1px solid var(--light);
+    border-right:1px solid var(--ink);
+    border-bottom:1px solid var(--ink);
+    font-size:9px;
+    line-height:11px;
+    text-align:center;
+    color:var(--ink);
+    cursor:pointer;
+    padding:0;
+    font-family:inherit;
+  }
+  .tb:active{border-color:var(--ink) var(--light) var(--light) var(--ink)}
+
+  .menubar{
+    display:flex;
+    gap:14px;
+    padding:2px 4px;
+    border-bottom:1px solid var(--shadow);
+    font-size:12px;
+  }
+  .menubar span{cursor:default}
+  .menubar span u{text-decoration:underline}
+  .menubar button{
+    background:none;border:0;padding:1px 3px;font:inherit;color:inherit;
+    cursor:pointer;
+  }
+  .menubar button u{text-decoration:underline}
+  .menubar button:hover{background:var(--navy);color:#fff}
+  .menubar button:active{background:var(--navy);color:#fff}
+  .menubar button:focus-visible{outline:1px dotted var(--ink);outline-offset:-2px}
+
+  .body{padding:8px}
+
+  .inset{
+    background:var(--paper);
+    border-top:1px solid var(--shadow);
+    border-left:1px solid var(--shadow);
+    border-right:1px solid var(--light);
+    border-bottom:1px solid var(--light);
+    box-shadow:inset 1px 1px 0 var(--ink);
+    padding:8px;
+  }
+
+  .btn{
+    background:var(--gray);
+    border-top:2px solid var(--light);
+    border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+    box-shadow:inset -1px -1px 0 var(--shadow), inset 1px 1px 0 #fff;
+    padding:2px 10px;
+    font-family:inherit;
+    font-size:12px;
+    cursor:pointer;
+    color:var(--ink);
+    min-height:22px;
+  }
+  .btn:active{
+    border-color:var(--ink) var(--light) var(--light) var(--ink);
+    box-shadow:inset 1px 1px 0 var(--shadow);
+    padding:3px 9px 1px 11px;
+  }
+  .btn:focus-visible{outline:1px dotted var(--ink);outline-offset:-4px}
+
+  /* ── desktop layout ───────────────────────────── */
+  .desktop{max-width:1080px;margin:0 auto;display:grid;gap:10px}
+  .row2{display:grid;gap:10px}
+  @media(min-width:860px){
+    .row2{grid-template-columns:1.15fr .85fr;align-items:start}
+  }
+
+  /* ── identity block ───────────────────────────── */
+  .id{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .id h1{
+    font-size:17px;
+    margin:0 0 2px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    position:relative;
+  }
+  .glitch{
+    text-shadow:1px 0 0 #ff00c8, -1px 0 0 #00e5ff;
+    animation:glitchshift 6s infinite steps(1);
+  }
+  @keyframes glitchshift{
+    0%,92%,100%{text-shadow:1px 0 0 #ff00c8, -1px 0 0 #00e5ff}
+    93%{text-shadow:-2px 0 0 #ff00c8, 2px 0 0 #00e5ff}
+    94%{text-shadow:2px 1px 0 #00e5ff, -2px -1px 0 #ff00c8}
+    95%{text-shadow:1px 0 0 #ff00c8, -1px 0 0 #00e5ff}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .glitch{animation:none}
+  }
+  .ascii{
+    font-family:"Courier New",monospace;
+    font-size:3.6px;
+    line-height:1;
+    margin:0 3px 0 0;
+    padding-right:5px;
+    color:var(--ink);
+    letter-spacing:0;
+    white-space:pre;
+    user-select:none;
+    flex:0 0 auto;
+    width:31em;
+    height:28em;
+    overflow:hidden;
+    contain:strict;
+    opacity:.85;
+  }
+  @media(min-width:640px){ .ascii{font-size:4.2px} }
+  .id .sub{font-size:12px;color:#000}
+  .id .rule{height:1px;background:var(--shadow);margin:6px 0;border-bottom:1px solid #fff}
+  .id p{margin:0;max-width:62ch}
+
+  /* ── project icons (Program Manager) ──────────── */
+  .pmgroup{
+    border-top:1px solid #fff;
+    border-left:1px solid #fff;
+    border-right:1px solid var(--shadow);
+    border-bottom:1px solid var(--shadow);
+    padding:10px 8px 8px;
+    margin-top:8px;
+  }
+  .pmgroup-label{
+    font-size:11px;
+    padding:0 4px;
+    margin:-18px 0 6px 4px;
+    background:var(--gray);
+    display:inline-block;
+    position:relative;
+    top:-1px;
+  }
+  .icons{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(112px,1fr));
+    gap:6px 4px;
+    padding:6px 0 2px;
+  }
+  .icon{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    padding:5px 3px;
+    border:1px dotted transparent;
+    cursor:pointer;
+    background:none;
+    font-family:inherit;
+    font-size:11px;
+    line-height:1.25;
+    text-align:center;
+    color:var(--ink);
+    width:100%;
+  }
+  .icon:hover{background:#d4d4d4}
+  .icon:focus-visible{outline:1px dotted var(--ink);outline-offset:-1px}
+  .icon.sel{background:var(--navy);color:#fff;border:1px dotted #fff}
+  .icon.sel .cap{background:var(--navy)}
+  .icon svg{width:32px;height:32px;display:block;image-rendering:pixelated}
+  .cap{display:block;padding:0 2px;max-width:100%;overflow-wrap:break-word}
+  .cap .meta{display:block;font-size:10px;opacity:.7}
+
+  /* ── skills table ─────────────────────────────── */
+  table{border-collapse:collapse;width:100%;font-size:11.5px}
+  th,td{
+    text-align:left;
+    padding:4px 6px;
+    border-bottom:1px solid #b0b0b0;
+    vertical-align:top;
+  }
+  th{
+    background:var(--gray);
+    border-bottom:1px solid var(--shadow);
+    border-top:1px solid #fff;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  tr:last-child td{border-bottom:0}
+  td.have{white-space:normal}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ── status bar ───────────────────────────────── */
+  .statusbar{display:flex;gap:2px;margin-top:3px}
+  .statusbar div{
+    border-top:1px solid var(--shadow);
+    border-left:1px solid var(--shadow);
+    border-right:1px solid var(--light);
+    border-bottom:1px solid var(--light);
+    padding:2px 6px;
+    font-size:11px;
+    flex:1 1 auto;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .statusbar div.n{flex:0 0 auto;font-variant-numeric:tabular-nums}
+
+  /* ── footer jokes ─────────────────────────────── */
+  .gags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 14px;
+    font-size:11px;
+    padding:8px 2px 22px;
+    color:#eaf7f7;
+    max-width:1080px;
+    margin:0 auto;
+    text-shadow:0 1px 0 rgba(0,0,0,.35);
+  }
+  .gags span{opacity:.95}
+  .gags .linkish{color:#eaf7f7;text-decoration:underline}
+  .gags a.linkish:hover{color:#fff}
+  .marquee{
+    overflow:hidden;
+    white-space:nowrap;
+    border-top:1px solid var(--shadow);
+    border-bottom:1px solid var(--shadow);
+    background:#b8b8b8;
+    font-size:11px;
+    padding:2px 0;
+    margin-top:8px;
+  }
+  .marquee b{
+    display:inline-block;
+    animation:slide 40s linear infinite;
+    font-weight:400;
+    white-space:nowrap;
+  }
+  .marquee b span{padding-right:64px}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){
+    .marquee b{animation:none}
+  }
+
+  /* ── modal project window ─────────────────────── */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.35);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:16px;
+    overflow:auto;
+    z-index:50;
+  }
+  .overlay.on{display:flex}
+  .modal{
+    width:min(760px,100%);
+    margin:auto;
+  }
+  .modal .body{padding:8px}
+  .proj{max-height:none}
+  .proj h2{
+    font-size:13px;
+    margin:0 0 6px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .kv{margin:0 0 8px}
+  .kv dt{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#404040;
+    margin-top:7px;
+  }
+  .kv dd{margin:1px 0 0}
+  .kv dd.mono{font-family:"Courier New",monospace;font-size:11.5px}
+  .shot{
+    margin-top:8px;
+    border-top:1px solid var(--shadow);
+    border-left:1px solid var(--shadow);
+    border-right:1px solid var(--light);
+    border-bottom:1px solid var(--light);
+    padding:2px;
+    background:var(--paper);
+  }
+  .shot img{display:block;width:100%;height:auto}
+  .clip{
+    display:block;
+    width:auto;
+    max-width:100%;
+    max-height:540px;
+    height:auto;
+    margin:0 auto;
+    background:#000;
+    border:1px solid #000;
+  }
+  .clipbox{
+    margin-top:8px;
+    border-top:1px solid var(--shadow);
+    border-left:1px solid var(--shadow);
+    border-right:1px solid var(--light);
+    border-bottom:1px solid var(--light);
+    padding:2px;
+    background:var(--paper);
+  }
+  .clipbox figcaption{font-size:10.5px;padding:3px 2px 1px;color:#404040}
+  .shot.tall img{max-height:520px;object-fit:cover;object-position:top}
+  .shot.phone{display:flex;justify-content:center}
+  .shot.phone img{width:auto;max-width:100%;max-height:580px;object-fit:contain}
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(64px,1fr));
+    gap:4px;
+    margin-top:8px;
+    padding:4px;
+    background:var(--paper);
+    border-top:1px solid var(--shadow);
+    border-left:1px solid var(--shadow);
+    border-right:1px solid var(--light);
+    border-bottom:1px solid var(--light);
+  }
+  .gallery img{
+    width:100%;
+    aspect-ratio:1;
+    object-fit:contain;
+    background:#f4f4f4;
+    display:block;
+    border:1px solid var(--shadow);
+  }
+  .screens{margin-top:9px}
+  .screens .shot{margin-top:0}
+  .screens .shot img{transition:opacity .12s}
+  .thumbs{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+  .thumb{
+    padding:2px;
+    background:var(--gray);
+    border-top:2px solid var(--light);
+    border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+    cursor:pointer;
+    line-height:0;
+    width:62px;
+    flex:0 0 auto;
+  }
+  .thumb img{width:100%;height:auto;display:block;opacity:.72}
+  .thumb:hover img{opacity:1}
+  .thumb.on{border-color:var(--ink) var(--light) var(--light) var(--ink)}
+  .thumb.on img{opacity:1;outline:1px dotted var(--ink);outline-offset:-1px}
+  .thumb:focus-visible{outline:1px dotted var(--ink);outline-offset:1px}
+  .screen-cap{font-size:10.5px;color:#404040;padding:4px 2px 0}
+  .links{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+  .links a{
+    background:var(--gray);
+    border-top:2px solid var(--light);
+    border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+    padding:2px 9px;
+    font-size:11.5px;
+    color:var(--ink);
+    text-decoration:none;
+    display:inline-block;
+  }
+  .links a:hover{background:#d4d4d4}
+  .links a:active{border-color:var(--ink) var(--light) var(--light) var(--ink)}
+  .links a::before{content:"→ ";opacity:.6}
+  .shot figcaption{
+    font-size:10.5px;
+    padding:3px 2px 1px;
+    color:#404040;
+  }
+  .modalrow{display:flex;justify-content:flex-end;gap:6px;padding:8px 8px 4px}
+  .warn{
+    font-size:11px;
+    border-top:1px solid var(--shadow);
+    border-bottom:1px solid #fff;
+    padding:5px 8px;
+    background:#e8e8e8;
+  }
+  .tag{
+    display:inline-block;
+    border:1px solid var(--shadow);
+    background:#d0d0d0;
+    padding:0 4px;
+    font-size:10.5px;
+    margin:0 3px 3px 0;
+  }
+
+  /* ── BSOD easter egg ──────────────────────────── */
+  #bsod{
+    position:fixed;
+    inset:0;
+    background:#0000aa;
+    color:#fff;
+    font-family:"Courier New",monospace;
+    padding:8vh 6vw;
+    display:none;
+    z-index:99;
+    font-size:14px;
+    line-height:1.7;
+  }
+  #bsod.on{display:block}
+  #bsod .k{background:#aaa;color:#0000aa;padding:0 6px;display:inline-block}
+  #bsod p{margin:0 0 14px;max-width:70ch}
+
+  .linkish{
+    background:none;border:0;padding:0;font:inherit;color:inherit;
+    text-decoration:underline;cursor:pointer;
+  }
+
+  /* ── папка OLD: проводник ─────────────────────── */
+  .folder-list{
+    border-top:1px solid var(--shadow);
+    border-left:1px solid var(--shadow);
+    border-right:1px solid var(--light);
+    border-bottom:1px solid var(--light);
+    background:var(--paper);
+    max-height:min(58vh,460px);
+    overflow:auto;
+  }
+  .fitem{
+    display:grid;
+    grid-template-columns:26px 1fr auto;
+    gap:8px;
+    align-items:center;
+    width:100%;
+    padding:5px 8px;
+    border:0;
+    border-bottom:1px solid #e2e2e2;
+    background:var(--paper);
+    font-family:inherit;
+    font-size:11.5px;
+    text-align:left;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .fitem:last-child{border-bottom:0}
+  .fitem:hover{background:#e8eef7}
+  .fitem:focus-visible{outline:1px dotted var(--ink);outline-offset:-2px}
+  .fitem.sel{background:var(--navy);color:#fff}
+  .fitem .nm{font-weight:700;letter-spacing:.02em}
+  .fitem .ds{display:block;font-weight:400;color:#4d5b66;font-size:10.5px;margin-top:1px}
+  .fitem.sel .ds{color:#c8d4e4}
+  .fitem .tp{font-size:10px;color:#5b6b78;white-space:nowrap}
+  .fitem.sel .tp{color:#c8d4e4}
+  .fitem svg{width:20px;height:20px;display:block}
+  .folderbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    padding:4px 8px;
+    border-bottom:1px solid var(--shadow);
+    background:var(--gray);
+    font-size:10.5px;
+    color:#33424f;
+  }
+  .archive{
+    font-family:"Courier New",monospace;
+    font-size:11px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    background:var(--paper);
+    border-top:1px solid var(--shadow);
+    border-left:1px solid var(--shadow);
+    border-right:1px solid var(--light);
+    border-bottom:1px solid var(--light);
+    padding:10px 12px;
+    max-height:min(58vh,460px);
+    overflow:auto;
+    margin:0;
+  }
+  .archive b{ color:#0f3f4f; }
+  .archive a{ color:#000080; }
+
+  /* скроллбары в стиле Win 3.1 */
+  .folder-list::-webkit-scrollbar,
+  .archive::-webkit-scrollbar,
+  .overlay::-webkit-scrollbar{ width:15px; height:15px }
+  .folder-list::-webkit-scrollbar-track,
+  .archive::-webkit-scrollbar-track,
+  .overlay::-webkit-scrollbar-track{ background:#dfdfdf; }
+  .folder-list::-webkit-scrollbar-thumb,
+  .archive::-webkit-scrollbar-thumb,
+  .overlay::-webkit-scrollbar-thumb{
+    background:var(--gray);
+    border-top:2px solid var(--light);
+    border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+  }
+  .folder-list,.archive{ scrollbar-color:#c0c0c0 #dfdfdf; scrollbar-width:thin; }
+
+  /* ── скрепыш ──────────────────────────────────── */
+  .clippy{
+    position:fixed;
+    right:10px;
+    bottom:10px;
+    z-index:40;
+    display:flex;
+    align-items:flex-end;
+    gap:6px;
+    max-width:min(330px,92vw);
+  }
+  .clippy img{
+    width:180px;
+    height:auto;
+    cursor:pointer;
+    will-change:transform;   /* чтобы transform не мылил картинку */
+    filter:drop-shadow(1px 1px 0 rgba(0,0,0,.35));
+  }
+  .clippy .say{
+    background:var(--gray);
+    border-top:2px solid var(--light);
+    border-left:2px solid var(--light);
+    border-right:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+    box-shadow:inset -1px -1px 0 var(--shadow), inset 1px 1px 0 #fff;
+    padding:5px 8px;
+    font-size:11px;
+    line-height:1.35;
+    max-width:225px;
+  }
+  .clippy .say b{
+    display:block;
+    font-size:10px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--navy);
+    margin-bottom:2px;
+  }
+  @keyframes clippyIn{
+    from{opacity:0;transform:translateY(7px) scale(.95)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+  }
+  @keyframes clippyBob{
+    0%,100%{transform:translate3d(0,0,0)}
+    30%{transform:translate3d(0,-4px,0)}
+    65%{transform:translate3d(0,-1px,0)}
+  }
+  .clippy img{transform-origin:50% 90%;animation:clippyBob 6s ease-in-out infinite}
+  .clippy img.bob-fast{animation:clippyBob 1.5s ease-in-out 2}
+  .clippy .say{animation:clippyIn .28s ease-out both}
+  .clippy .say.speaking{animation:clippyIn .34s ease-out both}
+  .clippy .say.mute{display:none}
+  @media(prefers-reduced-motion:reduce){
+    .clippy img,.clippy img.bob-fast,.clippy .say{animation:none}
+  }
+  @media(max-width:700px){
+    .clippy{max-width:min(300px,94vw);gap:4px;right:6px;bottom:6px}
+    .clippy .say{
+      font-size:10px;
+      line-height:1.3;
+      padding:4px 6px;
+      max-width:min(186px,56vw);
+    }
+    .clippy .say b{font-size:9px}
+    .clippy img{width:104px}
+    body{padding-bottom:96px}   /* чтобы скрепыш не садился на карточки */
+  }
+</style>
+</head>
+<body>
+
+<div class="desktop">
+
+  <!-- ══════════ PROGRAM MANAGER ══════════ -->
+  <div class="window">
+    <div class="titlebar">
+      <span class="t">OLEG.EXE: Program Manager</span>
+      <span class="tbtns">
+        <button class="tb" aria-label="Свернуть">_</button>
+        <button class="tb" aria-label="Развернуть">□</button>
+        <button class="tb" aria-label="Закрыть">×</button>
+      </span>
+    </div>
+
+    <div class="menubar">
+      <button type="button" data-menu="cv"><u>Ф</u>айл</button>
+      <button type="button" data-menu="projects"><u>П</u>роекты</button>
+      <button type="button" data-menu="skills"><u>С</u>киллы</button>
+      <button type="button" data-menu="help"><u>П</u>омощь</button>
+    </div>
+
+    <div class="body">
+      <div class="inset">
+        <div class="id">
+          <pre class="ascii" id="ascii-art" aria-hidden="true"></pre>
+          <div>
+            <h1>Олег Шпарбер</h1>
+            <div class="sub">Инженер ИИ-систем · Санкт-Петербург · 12 лет в инфраструктуре</div>
+            <div class="rule"></div>
+            <p>Двенадцать лет держал инфраструктуру живой: десятки серверов, десять тысяч хостов, uptime 99,5%.
+            Последние два года делаю то же самое, но вместо сервисов у меня модели, а вместо SLA принцип fail-closed.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pmgroup">
+        <div class="pmgroup-label">Работа: клиенты и продакшен</div>
+        <div class="icons" id="icons-work"></div>
+      </div>
+
+      <div class="pmgroup">
+        <div class="pmgroup-label">Пет-проекты и эксперименты</div>
+        <div class="icons" id="icons-pet"></div>
+      </div>
+
+      <div class="statusbar">
+        <div class="n" id="visits">Посетителей: 0</div>
+        <div>Готов. Как всегда.</div>
+        <div class="n" id="clock">--:--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ ROW: SKILLS + CONTACT ══════════ -->
+  <div class="row2">
+
+    <div class="window">
+      <div class="titlebar" id="skills-window">
+        <span class="t">SKILLS.TXT: что нужно рынку и что у меня</span>
+        <span class="tbtns">
+          <button class="tb" aria-label="Развернуть">□</button>
+          <button class="tb" aria-label="Закрыть">×</button>
+        </span>
+      </div>
+      <div class="body">
+        <div class="inset">
+          <table>
+            <thead>
+              <tr><th>Сейчас нужно</th><th>Чем закрываю</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ИИ-интеграции в продукт</td>
+                <td class="have">Мультимодальные LLM: текст, изображения, голос. Цепочки фолбэков, стриминг, схемы ответов</td>
+              </tr>
+              <tr>
+                <td>Чтобы ИИ не врал</td>
+                <td class="have">fail-closed: не подтвердилось из первоисточника, значит не показываю. Провенанс по каждому полю</td>
+              </tr>
+              <tr>
+                <td>Автоматизация рутины</td>
+                <td class="have">Telethon, кроны, метрики, алерты, Zabbix, дедуп потоков</td>
+              </tr>
+              <tr>
+                <td>Свои серверы, не SaaS</td>
+                <td class="have">VPS, systemd, nginx, бэкапы, Docker, CI/CD. Всё живёт без меня неделями</td>
+              </tr>
+              <tr>
+                <td>Проверка ИИ-кода</td>
+                <td class="have">Vitest, Playwright, приёмка по чек-листу вместо «ну вроде работает»</td>
+              </tr>
+              <tr>
+                <td>Бот, с которым не переписываются, а работают</td>
+                <td class="have">СПРУТ-бот: текст и голос, /today /weekend, mini app внутри. Дальше MAX</td>
+              </tr>
+              <tr>
+                <td>Приложение в сторе, а не «ещё один сайт»</td>
+                <td class="have">Программа 21 в RuStore: PWA + Capacitor, офлайн, шифрование на устройстве</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="warn">
+          Я не ML-инженер и не вайбкодер. Вайбкодер приносит то, что работало у него на ноутбуке.
+          Я приношу то, что работает у вас, а всё непроверенное отсекаю на входе.
+        </div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="titlebar">
+        <span class="t">CONTACT.EXE: связь</span>
+        <span class="tbtns">
+          <button class="tb" aria-label="Развернуть">□</button>
+          <button class="tb" aria-label="Закрыть">×</button>
+        </span>
+      </div>
+      <div class="body">
+        <div class="inset">
+          <dl class="kv" style="margin:0">
+            <dt>Почта</dt>
+            <dd class="mono">shunitoke@gmail.com</dd>
+            <dt>Телеграм</dt>
+            <dd class="mono">@osparber</dd>
+            <dt>Город</dt>
+            <dd>Санкт-Петербург, удалённо</dd>
+            <dt>Беру в работу</dt>
+            <dd>Проекты: сайты, приложения, боты, интеграции ИИ</dd>
+          </dl>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          <a class="btn" href="assets/CV_Oleg_Sparber.pdf" download="CV_Oleg_Sparber.pdf" style="text-decoration:none;display:inline-block">Скачать CV · PDF</a>
+          <a class="btn" href="assets/visitka.pdf" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">Визитка · PDF</a>
+          <button class="btn" onclick="openProject('p21')">Программа 21 · RuStore</button>
+          <button class="btn" onclick="openProject('spurt')">СПРУТ живьём</button>
+        </div>
+      </div>
+      <div class="statusbar">
+        <div>Обновлено: вчера. Обещаю.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="window">
+    <div class="titlebar">
+      <span class="t">HOW-I-WORK.TXT: как я работаю</span>
+      <span class="tbtns">
+        <button class="tb" aria-label="Развернуть">□</button>
+        <button class="tb" aria-label="Закрыть">×</button>
+      </span>
+    </div>
+    <div class="body">
+      <div class="inset">
+        <table>
+          <tbody>
+            <tr>
+              <td style="width:26px;font-weight:700">1</td>
+              <td>Разбираю задачу, а не техзадание. Сначала выясняю, что должно измениться в бизнесе, и только потом выбираю инструменты. Иногда честный ответ: чинить нечего, надо менять процесс.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">2</td>
+              <td>Показываю прототип до кода. Спорить о продукте дешевле на демо, чем после сдачи. У Пяти Углов так и вышло: сначала работающее демо, потом разговор о бюджете.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">3</td>
+              <td>Фиксирую объём, этапы и цену. Приёмка по чек-листу, а не «вроде работает». С LeChill был договор, техзадание и график работ.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">4</td>
+              <td>Отдаю насовсем. Доступы, документация, админка, бэкапы. Вы меняете контент и цены сами, я не нужен для каждой запятой.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn">
+        Если после сдачи нужна поддержка, это отдельная договорённость, а не «я всегда на связи». Так честнее для обеих сторон.
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <b><span>ОСТОРОЖНО, САЙТ ОТКРЫВАЕТСЯ БЫСТРЕЕ, ЧЕМ ВАШ CRM ● СОБРАНО НА НЕЙРОСЕТЯХ, ПРОВЕРЕНО НА ЛЮДЯХ ● 640 КБ ПАМЯТИ ХВАТИТ КАЖДОМУ ● ЛУЧШЕ ВСЕГО СМОТРИТСЯ В 800×600 ● СТРОИТСЯ С 1997 ГОДА ● COOKIES НЕ СОБИРАЮ, НЕ УМЕЮ ГОТОВИТЬ ● ВАЙБКОДЕР НЕ НАЙДЕН, ЗАГРУЖЕН ИНЖЕНЕР ●</span><span>ОСТОРОЖНО, САЙТ ОТКРЫВАЕТСЯ БЫСТРЕЕ, ЧЕМ ВАШ CRM ● СОБРАНО НА НЕЙРОСЕТЯХ, ПРОВЕРЕНО НА ЛЮДЯХ ● 640 КБ ПАМЯТИ ХВАТИТ КАЖДОМУ ● ЛУЧШЕ ВСЕГО СМОТРИТСЯ В 800×600 ● СТРОИТСЯ С 1997 ГОДА ● COOKIES НЕ СОБИРАЮ, НЕ УМЕЮ ГОТОВИТЬ ● ВАЙБКОДЕР НЕ НАЙДЕН, ЗАГРУЖЕН ИНЖЕНЕР ●</span></b>
+  </div>
+
+</div>
+
+<div class="gags">
+  <span>© 1997—2026</span>
+  <span>Сделано на нейросетях. Отвечаю за результат я.</span>
+  <span>12 лет поднимал серверы, теперь поднимаю LLM. Спина та же.</span>
+  <span><button class="linkish" onclick="bsod()">Версия для Netscape Navigator 2.0</button></span>
+  <span><a class="linkish" href="https://shir-man.com/pole-chudes-exe/" target="_blank" rel="noopener noreferrer">Не моё, но по вайбу: Поле Чудес в браузере</a></span>
+  <span><a class="linkish" href="https://plaza.one/" target="_blank" rel="noopener noreferrer">Nightwave Plaza: под это всё писалось</a></span>
+</div>
+
+<!-- ══════════ MODAL ══════════ -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Карточка проекта">
+  <div class="window modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
+    <div class="titlebar">
+      <span class="t" id="mtitle">PROJECT.EXE</span>
+      <span class="tbtns">
+        <button class="tb" aria-label="Закрыть" onclick="closeProject()">×</button>
+      </span>
+    </div>
+    <div class="body">
+      <div class="inset proj" id="mcontent"></div>
+    </div>
+    <div class="modalrow">
+      <button class="btn" onclick="closeProject()">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="clippy" id="clippy">
+  <div class="say" id="clippy-say"><b>Скрепыш</b>Похоже, вы ищете разработчика.</div>
+  <img src="assets/clippy-540.webp" width="540" height="358" alt="Скрепыш — нажми, чтобы услышать мысль" id="clippy-img" title="Нажми">
+</div>
+
+<div id="bsod" onclick="this.classList.remove('on')">
+  <p><span class="k"> Windows </span></p>
+  <p>Произошла ошибка 0E: VIBE_CODER_NOT_FOUND<br>
+  Возможно, вы искали исполнителя, который «сделает за 5 тысяч к утру».</p>
+  <p>Нажмите любую клавишу, чтобы вернуться к работающей системе.</p>
+  <p>* Нажмите в любом месте, чтобы продолжить</p>
+</div>
+
+<script>
+const PROJECTS = {
+  spurt: {
+    group: 'work',
+    title: 'СПРУТ.EXE',
+    name: 'СПРУТ: честная афиша Петербурга',
+    what: 'Афиши питерских площадок разбросаны по десяткам Telegram-каналов, и в каждой свой формат. Агрегаторы это перепубликуют и врут в датах, ценах и адресах. Человеку приходится сверять самому.',
+    stack: 'Python · SQLite · Telethon · GigaChat · systemd · nginx',
+    facts: [
+      '9 136 событий из 141 источника и 73 площадок, 423 подтверждены полностью',
+      'Даты, цены и адреса не выдумываются: каждое поле сверяется с текстом поста',
+      'У каждого поля есть ссылка на источник, любое изменение пишется с историей',
+      'Один реестр кормит шесть поверхностей: канал, mini app, сайт, голосовой бот, стейдж, админку',
+      'Живёт на своём VPS на кронах, ни одного платного SaaS в цепочке'
+    ],
+    note: 'Афиша, где событие может не подтвердиться и пропасть, честнее афиши, где всё есть, но половина неверна. Этот принцип я закладываю в любой проект, где ИИ работает с фактами.',
+    video: 'assets/video/spurt-mini-preview.mp4',
+    videoCap: 'Запись экрана: мобильная афиша в работе',
+    links: [
+      { label: 'Сайт', url: 'https://gigoctopus.ru' },
+      { label: 'Mini App', url: 'https://gigoctopus.ru/mini' },
+      { label: 'Канал', url: 'https://t.me/gigoctopus' }
+    ]
+  },
+  gaslight: {
+    group: 'work',
+    title: 'ГАЗЛАЙТ.EXE',
+    name: 'Gaslight Analysis: ИИ разбирает переписку',
+    what: 'Человек читает переписку и не понимает, что в ней происходит: ему внушают вину, путают факты, переставляют события. Психолог стоит денег и времени, а разобраться надо сейчас.',
+    stack: 'Next.js 16 · React 19 · TypeScript · Tailwind · shadcn/ui · GigaChat vision · Vercel Blob · Redis · Paddle',
+    facts: [
+      'Выгружаешь чат из семи мессенджеров и получаешь разбор приёмов с цитатами',
+      'Понимает не только текст: стикеры, картинки и голосовые с расшифровкой',
+      'Каждый вывод подкреплён цитатой из переписки, а не оценкой на глаз',
+      'Оплата работает: Paddle, premium-доступ, лимиты и очередь задач',
+      'Аккаунтов нет, данные стираются после анализа, шесть языков, PWA и тесты'
+    ],
+    note: 'Продукт живёт на своём домене и принимает деньги. Здесь приватность сделана архитектурой: сервер не хранит переписку, потому что ему нечего хранить.',
+    video: 'assets/video/texts-with-my-ex-preview.mp4',
+    videoCap: 'Ролик: как это работает',
+    links: [
+      { label: 'Сайт', url: 'https://textswithmyex.app/' },
+      { label: 'Фолбек', url: 'https://gaslightdetector.vercel.app/' },
+      { label: 'Код', url: 'https://github.com/shunitoke/gaslight_app' }
+    ]
+  },
+  vibejob: {
+    group: 'work',
+    title: 'VIBEJOB.EXE',
+    name: 'vibejob: поиск работы на человеческом языке',
+    what: 'Поиск работы сводится к анкетам и дропдаунам: фильтры не понимают «удалёнка без созвонов» и «без токсичного менеджера». Человек просматривает сотни вакансий, которые ему не подходят.',
+    stack: 'Python · FastAPI · Tauri · React · GigaChat / OpenAI / Claude / DeepSeek / Gemini',
+    facts: [
+      'Описываешь работу словами, получаешь подборку с объяснением, почему подходит',
+      'Десятки источников в одном окне: hh.ru, Telegram-каналы, RemoteJob, WeWorkRemotely, Djinni',
+      'Автовыбор самой дешёвой рабочей модели, чтобы анализ не стоил как подписка',
+      'Резюме файлом уточняет подбор, а не переписывает его',
+      'Скачал .exe или бинарник и работаешь: установки нет, ключ не покидает машину'
+    ],
+    note: 'Здесь не «ещё один агрегатор», а перевод человеческой хотелки в запрос. Работает локально, поэтому личное резюме не уезжает на чужой сервер.',
+    video: 'assets/video/llm-job-parser-preview.mp4',
+    videoCap: 'Ролик: описал вакансию словами и получил подборку',
+    links: [
+      { label: 'Скачать', url: 'https://github.com/shunitoke/llmjobparser/releases/latest' },
+      { label: 'Код', url: 'https://github.com/shunitoke/llmjobparser' }
+    ]
+  },
+
+  p21: {
+    group: 'work',
+    title: 'PROGRAM21.EXE',
+    name: 'Программа 21: тренер привычек',
+    what: 'Трекеры привычек и дневники живут на чужих серверах: личные записи о настроении и срывах лежат там, откуда их можно выгрузить. А без интернета приложение просто не работает.',
+    stack: 'Next.js · React 18 · TypeScript · Capacitor · Vite PWA · AES-GCM',
+    facts: [
+      'Личный дневник шифруется на телефоне: ключ есть только у владельца',
+      'Серверов нет вообще, поэтому и утечки неоткуда взяться',
+      'Работает без интернета: самолёт, метро, дача',
+      'Привычки, серии, heatmap прогресса и практики с аудиозаписью',
+      'Опубликовано в RuStore, ставится и как PWA, обновляется само'
+    ],
+    note: 'Приложение скачивают незнакомые люди, и это главный показатель: продукт довели до стора, а не до скриншота. Приватность здесь не в политике, а в архитектуре.',
+    video: 'assets/video/programma-21-preview.mp4',
+    videoCap: 'Ролик: приложение в работе',
+    links: [
+      { label: 'RuStore', url: 'https://rustore.ru/catalog/app/com.programma21.app' },
+      { label: 'PWA', url: 'https://21-five-gamma.vercel.app' }
+    ]
+  },
+
+  cam: {
+    group: 'pet',
+    title: 'CAMTECH.EXE',
+    name: 'Cam Techno: камера как инструмент',
+    what: 'Браузерный техно-инструмент: вебкамера распознаёт две руки, а жесты управляют генератором ритма и реактивной графикой. Контроллера в руках нет.',
+    stack: 'JavaScript · MediaPipe (hand tracking) · Web Audio / AudioWorklet · Three.js · Web MIDI',
+    facts: [
+      'Трекинг двух рук из видеопотока прямо в браузере',
+      'Жесты: pinch и непрерывное XY задают темп, тембр, плотность и энергию',
+      'Реактивные визуалы на Three.js, привязанные к звуку',
+      'Опционально MIDI-клавиатура через Web MIDI',
+      'Два режима: RAVE (биты) и DRONE (бас и гитара под руками)'
+    ],
+    note: 'Технодемка на стыке CV и аудио. Камера здесь сенсор, а не созвон. Заодно проверка, что realtime-графика в браузере не разваливается.',
+    video: 'assets/video/cam-performance-preview.mp4',
+    videoCap: 'Ролик: руки управляют звуком и графикой',
+    links: [
+      { label: 'Демо', url: 'https://shunitoke-cam-game-190f.twc1.net/' },
+      { label: 'Код', url: 'https://github.com/shunitoke/cam_game' }
+    ]
+  },
+  five: {
+    group: 'work',
+    title: '5UGLOV.EXE',
+    name: 'Пять углов: дизайн-концепция издания',
+    what: 'У издания школьный сайт на старом PHP: вёрстка под фиксированные 640 пикселей, из-за сессий страницы не кэшируются, Lighthouse 80 по скорости и 61 по доступности, рубрики дублируются по двум адресам. Редакция хотела понять, что даст обновление.',
+    stack: 'Node · ванильный JS · CSS · GigaChat на сервере',
+    facts: [
+      'Работающее демо вместо презентации: рубрики, авторы, поиск, статьи, лайтбокс',
+      'Озвучка статьи и пересказ простыми словами: то, чего нет у конкурентов',
+      'Десять настоящих материалов с авторством и ссылками на источники',
+      'Концепция ушла редакции вместе с коммерческим предложением и этапами работ',
+      'Демо с честными границами: без логина, базы, аналитики и рекламных скриптов'
+    ],
+    note: 'Первый этап сделан бесплатно как аргумент: показать, а не рассказать. Дальше разговор о бюджете идёт по конкретному демо, а не по презентации.',
+    shot: 'assets/5uglov.png',
+    shotCap: 'Главная страница концепции',
+    links: [
+      { label: 'Демо', url: 'https://gigoctopus.ru/pole/5uglov/' }
+    ]
+  },
+  stamps: {
+    group: 'pet',
+    title: 'STAMPS.EXE',
+    name: 'Каталог марок и монет: 2 103 предмета',
+    what: 'Реестр коллекции с идентификацией через LLM: страна, год, каталожный номер, оценка. Источник истины в реестрах и фотографиях, интерфейс ничего не меняет молча.',
+    stack: 'Python · CSV · LLM-идентификация · витрина с авторизацией · 4 206 фото',
+    facts: [
+      '2 103 предмета: 1 929 марок и 174 монеты, все с фотографиями',
+      '338 975 ₽ по каталогу, каждая цена привязана к источнику подтверждения',
+      'Топ-30 позиций дают 42% стоимости. Остальное балласт',
+      'Закрытая витрина с гостевыми ссылками со сроком действия, noindex',
+      'Тесты и сборка каталога из исходных реестров'
+    ],
+    note: 'Тот же принцип, что в афише: сначала реестр и доказательства, потом красивая обёртка. Ошибка в оценке стоит дороже, чем время на проверку.',
+    gallery: ['assets/stamp1.webp','assets/stamp2.webp','assets/stamp3.webp','assets/stamp4.webp','assets/stamp5.webp','assets/stamp6.webp','assets/stamp7.webp','assets/stamp8.webp','assets/coin1.webp','assets/coin2.webp'],
+    galleryCap: 'Реальные предметы из реестра: марки и монеты'
+  },
+  liferandom: {
+    group: 'pet',
+    title: 'LIFERANDOM.EXE',
+    name: 'Life Randomizer: приложение в RuStore',
+    what: 'Не можешь решиться? Задаёшь вопрос, крутишь 3D-спиннер и получаешь ответ. От полезного совета до прямого оскорбления. Приложение считает статистику решительности и «процент ссыкла».',
+    stack: 'Flutter · 3D-спиннер · локальная статистика · RuStore',
+    facts: [
+      'Опубликовано в RuStore: com.example.life_randomizer, версия 1.0.3',
+      'Больше 25 вариантов ответа, от полезных до оскорбительных',
+      'Реалистичный 3D-спиннер и агрессивные анимации',
+      'Считает вопросы, выполненные решения и «процент ссыкла»',
+      'Категория «Развлечения», теги «Юмор» и «Стиль жизни»'
+    ],
+    note: 'Шутка, доведённая до публикации в сторе. Пользы ноль, зато честно: спросил и не сделал, получил клеймо.',
+    screens: [
+      { src: 'assets/lr-full1.webp', cap: 'Старт: задай вопрос и жми «Решить за меня»' },
+      { src: 'assets/lr-full2.webp', cap: 'Крутится 3D-спиннер' },
+      { src: 'assets/lr-full3.webp', cap: 'Ответ и приговор: «ЛУЧШЕ ВЫПЕЙ ВОДЫ», процент ссыкла 100%' }
+    ],
+    links: [
+      { label: 'RuStore', url: 'https://www.rustore.ru/catalog/app/com.example.life_randomizer' }
+    ]
+  },
+
+  lechill: {
+    group: 'work',
+    title: 'LECHILL.EXE',
+    name: 'Le’Чилл: сайт салона красоты',
+    what: 'Своего сайта у салона не было. Записывались через ВК, Telegram и Яндекс.Карты, то есть на чужой территории: без контроля над тем, как выглядит салон и что видит клиент. Владельцы попросили свой сайт.',
+    stack: 'React 19 · TypeScript · Vite · Tailwind · shadcn/ui · Framer Motion · PocketBase',
+    facts: [
+      'Свой сайт вместо записи через ВК, Telegram и Яндекс.Карты',
+      'Клиент видит услуги, мастеров, работы и свободное время, записывается сам',
+      'Владелец меняет цены, акции и галерею через PocketBase, ко мне не обращается',
+      'Сайт и база живут на своих серверах, без подписок и внешних сервисов',
+      'Сдано по договору и техзаданию, с графиком работ и приёмкой',
+      'В комплекте SEO-аудит и гайд по трафику: владелец знает, откуда приходят люди'
+    ],
+    note: 'Это не «сайт-визитка». Салон получил свою площадку вместо чужой: запись идёт без посредников, контент живёт без разработчика.',
+    shot: 'assets/lechill.webp',
+    shotCap: 'Главная страница: услуги, специалисты, онлайн-запись',
+    links: [
+      { label: 'Сайт', url: 'https://lechill.ru' }
+    ]
+  },
+
+  vibeware: {
+    inFolder: 'old',
+    title: 'VIBEWARE.EXE',
+    name: 'VIBEWARE: анти-стартап',
+    what: 'Провокационный лендинг-сатира на стартап-культуру: «Automated emptiness. The ecosystem of nothing». Продукт, который ничего не делает, но продаёт себя как экосистему.',
+    stack: 'TypeScript · Next.js · анимация',
+    facts: [
+      'Собственный тон и голос, редкий навык в продуктовом тексте',
+      'Интерактив как аргумент: шутка работает только когда её можно потрогать',
+      'Проверка себя: могу ли я делать острое, а не одно полезное'
+    ],
+    note: 'Коммерческого кейса здесь нет. Зато видно, что я держу авторский тон и не превращаюсь в генератор корпоративных лендингов.',
+    video: 'assets/video/vibeware-preview.mp4',
+    videoCap: 'Ролик: что это за штука',
+    links: [
+      { label: 'Демо', url: 'https://shunitoke-orchids-project-platform-8b19.twc1.net/' }
+    ]
+  },
+  fakecal: {
+    inFolder: 'old',
+    title: 'FAKECAL.EXE',
+    name: 'Fake Calendar: генератор занятости',
+    what: 'Создаёт фейковое расписание, чтобы выглядеть занятым. Маленький сервис на один запрос, сделанный за вечер.',
+    stack: 'Next.js · TypeScript · Vercel',
+    facts: [
+      'Форма → расписание, никакой регистрации',
+      'Задумано как шутка, а разошлось как инструмент',
+      'Проверка скорости: идея, сборка и прод за один вечер'
+    ],
+    note: 'Полезная часть здесь в цикле: придумал, собрал, задеплоил, проверил на людях. Так идеи и проверяются до того, как за них платят.',
+    video: 'assets/video/fakecalendar-preview.mp4',
+    videoCap: 'Ролик: как это выглядит',
+    links: [
+      { label: 'Демо', url: 'https://fakecalendar.vercel.app/' }
+    ]
+  },
+  regret: {
+    inFolder: 'old',
+    title: 'REGRET.EXE',
+    name: 'Regret Calculator: калькулятор сожалений',
+    what: 'Считает упущенные возможности и неверные решения: сколько стоили бы те, что ты не выбрал. Инструмент для любителей посчитать боль.',
+    stack: 'Vercel · base44 · TypeScript',
+    facts: [
+      'Пошаговый ввод без регистрации',
+      'Считает «альтернативную стоимость» выборов',
+      'Ещё одна проверка: делаю быстро и не боюсь странных тем'
+    ],
+    note: 'Сделан по той же схеме, что и остальные: короткий цикл, живой продакшен, никакой презентации вместо продукта.',
+    video: 'assets/video/regret-calculator-preview.mp4',
+    videoCap: 'Ролик: как выглядит расчёт',
+    links: [
+      { label: 'Демо', url: 'https://the-regret-calculator-257f790b.base44.app/' }
+    ]
+  },
+};
+
+const ICONS = {
+  spurt: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="8" width="26" height="16" fill="#fff" stroke="#000"/><circle cx="16" cy="16" r="5" fill="#008080" stroke="#000"/><circle cx="14" cy="15" r="1" fill="#fff"/><circle cx="18" cy="15" r="1" fill="#fff"/><path d="M8 24v4M12 24v5M20 24v5M24 24v4" stroke="#000" stroke-width="1.5"/></svg>',
+  gaslight: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="26" height="18" fill="#fff" stroke="#000"/><path d="M9 23v5l5-5" fill="#fff" stroke="#000"/><path d="M10 11h12M10 15h8" stroke="#000" stroke-width="1.5"/><rect x="20" y="2" width="9" height="9" fill="#c00000" stroke="#000"/><path d="M24.5 4.5v4M22.5 6.5h4" stroke="#fff" stroke-width="1.5"/></svg>',
+  vibejob: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="6" width="22" height="16" fill="#fff" stroke="#000"/><rect x="2" y="6" width="22" height="4" fill="#000080"/><path d="M6 14h10M6 18h7" stroke="#606060"/><circle cx="23" cy="21" r="6" fill="none" stroke="#000" stroke-width="2"/><path d="M27.5 25.5l3.5 3.5" stroke="#000" stroke-width="2.5"/><path d="M21 18l-1.5 3h2.5l-1 3 3-3.5h-2.5z" fill="#c00000"/></svg>',
+  p21: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" fill="#fff" stroke="#000"/><rect x="3" y="3" width="26" height="5" fill="#000"/><path d="M3 12h26M3 18h26M3 24h26M9 8v21M16 8v21M23 8v21" stroke="#b0b0b0" stroke-width="1"/><rect x="10" y="19" width="5" height="4" fill="#2e6d2e"/><rect x="17" y="13" width="5" height="4" fill="#2e6d2e"/><rect x="17" y="19" width="5" height="4" fill="#7fb07f"/><rect x="24" y="19" width="4" height="4" fill="#d0d0d0"/></svg>',
+  five: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="4" width="26" height="24" fill="#f4f1e8" stroke="#000"/><rect x="6" y="7" width="9" height="6" fill="#808080"/><path d="M17 7h9M17 10h7M6 16h20M6 19h20M6 22h14M6 25h10" stroke="#606060"/></svg>',
+  stamps: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 3h2v2H5zM10 3h2v2h-2zM15 3h2v2h-2zM20 3h2v2h-2zM25 3h2v2h-2zM3 5h2v2H3zM3 10h2v2H3zM3 15h2v2H3zM3 20h2v2H3zM27 5h2v2h-2zM27 10h2v2h-2zM27 15h2v2h-2zM27 20h2v2h-2z" fill="#000"/><rect x="6" y="6" width="20" height="20" fill="#fff" stroke="#000"/><circle cx="16" cy="16" r="6" fill="#2e6d2e" stroke="#000"/><path d="M5 27h2v2H5zM10 27h2v2h-2zM15 27h2v2h-2zM20 27h2v2h-2zM25 27h2v2h-2z" fill="#000"/></svg>',
+  cam: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="9" width="18" height="13" fill="#404040" stroke="#000"/><path d="M20 13l8-4v13l-8-4z" fill="#808080" stroke="#000"/><circle cx="11" cy="15" r="4" fill="#7fc7ff" stroke="#000"/><path d="M8 4h12M8 28h12" stroke="#000" stroke-width="2"/><circle cx="11" cy="15" r="1.5" fill="#fff"/></svg>',
+  liferandom: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 10V4M11.5 18.5L6 22M20.5 18.5L26 22" stroke="#d94a35" stroke-width="5" stroke-linecap="round"/><circle cx="16" cy="16" r="7" fill="#d94a35" stroke="#000"/><circle cx="16" cy="16" r="2.6" fill="#fff" stroke="#000"/><circle cx="16" cy="5" r="2" fill="#555" stroke="#000"/><circle cx="7" cy="22" r="2" fill="#555" stroke="#000"/><circle cx="25" cy="22" r="2" fill="#555" stroke="#000"/></svg>',
+  lechill: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="9" width="26" height="19" fill="#fff" stroke="#000"/><rect x="2" y="4" width="28" height="6" fill="#c00080" stroke="#000"/><path d="M8 13h16" stroke="#000"/><rect x="7" y="17" width="7" height="8" fill="#f0d9e8" stroke="#000"/><rect x="18" y="17" width="7" height="8" fill="#f0d9e8" stroke="#000"/><circle cx="10.5" cy="21" r="1.6" fill="#c00080"/><circle cx="21.5" cy="21" r="1.6" fill="#c00080"/></svg>',
+  vibeware: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="4" width="28" height="24" fill="#fff" stroke="#000"/><rect x="2" y="4" width="28" height="6" fill="#000"/><path d="M6 14l4 8 4-8 4 8 4-8" stroke="#c00000" stroke-width="2" fill="none"/><path d="M6 26h20" stroke="#808080"/></svg>',
+  fakecal: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="26" height="23" fill="#fff" stroke="#000"/><rect x="3" y="5" width="26" height="5" fill="#c00000"/><path d="M8 3v5M24 3v5" stroke="#000" stroke-width="2"/><path d="M7 15h5v4H7zM14 15h5v4h-5zM21 15h4v4h-4zM7 22h5v4H7zM14 22h5v4h-5z" fill="#b0b0b0"/><path d="M18 20l4 4M22 20l-4 4" stroke="#c00000" stroke-width="2"/></svg>',
+  regret: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="2" width="24" height="28" fill="#c0c0c0" stroke="#000"/><rect x="7" y="5" width="18" height="6" fill="#7f7f00" stroke="#000"/><path d="M7 9h18" stroke="#000"/><rect x="8" y="14" width="6" height="5" fill="#fff" stroke="#000"/><rect x="18" y="14" width="6" height="5" fill="#fff" stroke="#000"/><rect x="8" y="22" width="6" height="5" fill="#fff" stroke="#000"/><rect x="18" y="22" width="6" height="5" fill="#c00000" stroke="#000"/></svg>'
+};
+
+const FOLDER_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2 7h11l3 4h12v17H2z" fill="#ffcf4d" stroke="#000"/><path d="M2 12h26" stroke="#c79a1e"/><path d="M2 7h11l3 4" fill="none" stroke="#000"/></svg>';
+const FILE_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 3h13l6 6v20H7z" fill="#fff" stroke="#000"/><path d="M20 3v6h6" fill="none" stroke="#000"/><path d="M10 14h12M10 18h12M10 22h8" stroke="#8a8a8a"/></svg>';
+const EXE_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="24" height="22" fill="#fff" stroke="#000"/><rect x="4" y="5" width="24" height="5" fill="#000080"/><path d="M8 15h8M8 19h6" stroke="#666"/><path d="M18 17l7 4-3 1 2 4-2 1-2-4-2 2z" fill="#2e6d2e" stroke="#000" stroke-width=".7"/></svg>';
+
+const ARCHIVE_TEXT = `ЭКЗИСТЕНЦИАЛЬНЫЙ АРХИВ
+Одиннадцать проектов. Ни один не продаётся. Сделаны потому что хотелось.
+
+════════════════════════════════════════════════════════════════
+С БИНАРНИКОМ: ЕСТЬ ЧТО ЗАПУСТИТЬ
+════════════════════════════════════════════════════════════════
+
+NES / DENDY  ·  2025  ·  6502 ассемблер, cc65
+  Пять игр под Dendy и NES, каждая ровно 40 КБ:
+  tetris_like, space_invaders, breakout, snake, pong.
+  Плюс mario_clone на NESFAB и полный стартовый набор для
+  разработки под NES: компилятор cc65, эмулятор Mesen,
+  редактор тайлов yy-chr.
+  ROM-файлы открываются в любом эмуляторе.
+
+64KB  ·  2025  ·  C++, CMake, XAudio2, D3D11
+  Интро в духе 64k. Звук генерируется процедурно на старте,
+  поверх идёт полноэкранный шейдер с туннелем и сменой палитр.
+  Собирается в demo64kb.exe. Ассетов нет, всё из кода.
+
+INNER COMPASS  ·  2025  ·  Flutter
+  Приложение сразу под шесть платформ: Android, iOS, Linux,
+  macOS, Windows, Web. Локальное хранилище на Hive, тёмная
+  «шаманская» тема, онбординг и профиль пользователя.
+  В репозитории лежат openspec и тесты.
+
+════════════════════════════════════════════════════════════════
+ЖИВОЕ В СЕТИ
+════════════════════════════════════════════════════════════════
+
+MOM69  ·  2025  ·  Next.js
+  «С Днём Рождения, Мамочка!», максимально кринжовый
+  сайт-поздравление: радужный текст, падающие эмодзи, карусель
+  видео, вращающиеся сердечки, конфетти по кнопке, бегущая
+  строка. Сделан за вечер, работает до сих пор.
+  https://mom69.vercel.app
+
+════════════════════════════════════════════════════════════════
+ТОЛЬКО ИСХОДНИКИ
+════════════════════════════════════════════════════════════════
+
+MEMENTO MORI  ·  React, Vite, Tailwind
+  «Узнай, сколько времени у тебя осталось на самом деле»:
+  живой счётчик до статистической смерти.
+  В коде подписан Memento Mori, Time Remaining.
+  A live countdown to your statistical death.
+
+SOCIAL NETWORK FOR ONE  ·  Next.js, Radix
+  «Tabula rasa. Единственная соцсеть, где ты главный герой.
+  И единственный персонаж.» Лента, профиль и диалоги на одного.
+
+NARCISSIST  ·  Next.js, OpenRouter AI SDK
+  Трёхминутный тест личности с разбором от языковой модели.
+  «Understand your personality patterns through a 3-minute
+  assessment.» Три языка.
+
+RESIGNATION MEDITATION  ·  React, Vite, Capacitor
+  «Спокойное место для тех, кто уже уволился внутри».
+  Медитация-визуализация увольнения, дыхательная практика
+  «да и fuck it», генератор креативных заявлений, офисные звуки
+  для фокуса, тест «пора ли», ежедневная мотивация.
+  Семь языков, офлайн, без сбора данных.
+  Собирается в APK под Android и iOS, инструкция в репозитории.
+
+TINDER FOR MEANING  ·  Flutter
+  Свайпы не по людям, а по смыслам. Экраны, модели данных,
+  локальное состояние.
+
+NTDN  ·  Flutter
+  Приложение с локальными уведомлениями и своим набором данных.
+
+MAFIA №1  ·  Next.js, Supabase, Radix
+  Сайт игрового клуба «Мафия»: расписание игр, брони, аккаунты
+  через Supabase. Собран в v0.app, доведён до рабочего вида.
+
+TORTURE APP  ·  Flutter
+  Две версии одного эксперимента: свой движок и UI поверх
+  стандартного каркаса Flutter.
+
+════════════════════════════════════════════════════════════════
+
+Почему здесь: у этих проектов нет ни живого сайта, ни бинарника,
+которые не стыдно показать. Зато видно диапазон: игры под Dendy
+на ассемблере, счётчик до собственной смерти, соцсеть на одного.
+Текстовый файл единственный формат, который их переживёт.
+`;
+
+const FOLDERS = {
+  old: {
+    title: 'C:\\OLD — Проводник',
+    cap: 'OLD',
+    items: ['vibeware', 'fakecal', 'regret', 'archive']
+  }
+};
+
+const workWrap = document.getElementById('icons-work');
+const petWrap = document.getElementById('icons-pet');
+
+function addIcon(wrap, id, svg, cap, meta, handler) {
+  const b = document.createElement('button');
+  b.className = 'icon';
+  b.type = 'button';
+  b.dataset.id = id;
+  b.innerHTML = `${svg}<span class="cap">${cap}<span class="meta">${meta}</span></span>`;
+  b.addEventListener('click', handler);
+  wrap.appendChild(b);
+  return b;
+}
+
+for (const [id, p] of Object.entries(PROJECTS)) {
+  if (p.inFolder) continue;
+  const wrap = p.group === 'pet' ? petWrap : workWrap;
+  addIcon(wrap, id, ICONS[id] || '', p.title.replace('.EXE', ''), p.stack.split(' · ')[0], () => openProject(id));
+}
+
+const oldCount = FOLDERS.old.items.length;
+addIcon(petWrap, 'folder-old', FOLDER_SVG, 'OLD', `папка · ${oldCount} файла`, () => openFolder('old'));
+
+function openFolder(fid) {
+  const f = FOLDERS[fid];
+  if (!f) return;
+  document.getElementById('mtitle').textContent = f.title;
+  const rows = f.items.map(id => {
+    if (id === 'archive') {
+      return `<button class="fitem" data-open="archive">
+        ${FILE_SVG}
+        <span><span class="nm">ARCHIVE.TXT</span><span class="ds">Экзистенциальный архив: проекты без сайта и без бинарника</span></span>
+        <span class="tp">${(new Blob([ARCHIVE_TEXT]).size / 1024).toFixed(1)} КБ · текст</span>
+      </button>`;
+    }
+    const p = PROJECTS[id];
+    if (!p) return '';
+    return `<button class="fitem" data-open="${id}">
+      ${EXE_SVG}
+      <span><span class="nm">${p.title}</span><span class="ds">${p.name}</span></span>
+      <span class="tp">${p.stack.split(' · ')[0]}</span>
+    </button>`;
+  }).join('');
+
+  document.getElementById('mcontent').innerHTML = `
+    <div class="folderbar">
+      <span>Содержимое: C:\\OLD</span>
+      <span>${oldCount} объекта</span>
+    </div>
+    <div class="folder-list">${rows}</div>
+    <div class="warn" style="margin-top:8px">Старые проекты. Часть живая, часть осталась только текстом — так честнее, чем делать вид, что всё поддерживается.</div>
+  `;
+  document.querySelectorAll('#mcontent .fitem').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.open;
+      if (t === 'archive') openArchive();
+      else openProject(t);
+    });
+  });
+  openOverlay();
+}
+
+function openArchive() {
+  document.getElementById('mtitle').textContent = 'ARCHIVE.TXT — Блокнот';
+  document.getElementById('mcontent').innerHTML =
+    `<pre class="archive">${ARCHIVE_TEXT.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre>`;
+  openOverlay();
+}
+
+function openProject(id) {
+  const p = PROJECTS[id];
+  if (!p) return;
+  document.getElementById('mtitle').textContent = p.title + ' — просмотр';
+  const facts = p.facts.map(f => `<li>${f}</li>`).join('');
+
+  const shot = p.shot
+    ? `<figure class="shot ${p.shotClass || ''}"><img src="${p.shot}" alt="${p.shotCap}" loading="lazy"><figcaption>${p.shotCap}</figcaption></figure>`
+    : '';
+
+  const gallery = (p.gallery && p.gallery.length)
+    ? `<div class="gallery">${p.gallery.map(s => `<img src="${s}" alt="предмет из реестра" loading="lazy">`).join('')}</div>
+       ${p.galleryCap ? `<div style="font-size:10.5px;padding:3px 2px 0;color:#404040">${p.galleryCap}</div>` : ''}`
+    : '';
+
+  const screens = (p.screens && p.screens.length)
+    ? `<div class="screens">
+         <figure class="shot phone"><img id="screen-main" src="${p.screens[0].src}" alt="экран приложения"></figure>
+         <div class="thumbs">
+           ${p.screens.map((s, i) => `<button class="thumb${i === 0 ? ' on' : ''}" type="button" data-src="${s.src}" data-cap="${s.cap.replace(/"/g, '&quot;')}"><img src="${s.src}" alt="экран ${i + 1}" loading="lazy"></button>`).join('')}
+         </div>
+         <div class="screen-cap" id="screen-cap">${p.screens[0].cap}</div>
+       </div>`
+    : '';
+
+  const video = p.video
+    ? `<figure class="clipbox">
+         <video class="clip" src="${p.video}" autoplay loop muted playsinline controls preload="metadata"></video>
+         <figcaption>${p.videoCap || 'Видео-демо'}</figcaption>
+       </figure>`
+    : '';
+
+  const links = (p.links && p.links.length)
+    ? `<div class="links">${p.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener noreferrer">${l.label}</a>`).join('')}</div>`
+    : '';
+
+  const back = p.inFolder
+    ? `<div class="folderbar" style="margin-bottom:9px"><button class="linkish" onclick="openFolder('${p.inFolder}')">← Назад в OLD</button><span>${p.title}</span></div>`
+    : '';
+
+  const isWork = p.group === 'work';
+  const labelWhat = isWork ? 'Что было' : 'Задача';
+  const labelDone = isWork ? 'Что стало' : 'Что получилось';
+
+  document.getElementById('mcontent').innerHTML = `
+    ${back}
+    <h2>${p.name}</h2>
+    <dl class="kv">
+      <dt>${labelWhat}</dt><dd>${p.what}</dd>
+      <dt>Стек</dt><dd class="mono">${p.stack}</dd>
+      <dt>${labelDone}</dt><dd><ul style="margin:2px 0 0;padding-left:18px">${facts}</ul></dd>
+    </dl>
+    ${links}
+    ${screens || shot}
+    ${video}
+    ${gallery}
+    <div class="warn" style="margin-top:8px">${p.note}</div>
+  `;
+  document.querySelectorAll('#mcontent .thumb').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const main = document.getElementById('screen-main');
+      if (main) main.src = btn.dataset.src;
+      const cap = document.getElementById('screen-cap');
+      if (cap) cap.textContent = btn.dataset.cap;
+      document.querySelectorAll('#mcontent .thumb').forEach(x => x.classList.remove('on'));
+      btn.classList.add('on');
+    });
+  });
+
+  openOverlay();
+}
+
+let lastFocused = null;
+
+function lockScroll(on) {
+  // прокручивается documentElement, а не body — запирать надо оба
+  document.documentElement.style.overflow = on ? 'hidden' : '';
+  document.body.style.overflow = on ? 'hidden' : '';
+}
+
+function openOverlay() {
+  lastFocused = document.activeElement;
+  document.getElementById('overlay').classList.add('on');
+  lockScroll(true);
+  // фокус переезжает внутрь, чтобы Tab не гулял по фону
+  const box = document.querySelector('#overlay .modal') || document.getElementById('overlay');
+  box.setAttribute('tabindex', '-1');
+  box.focus({ preventScroll: true });
+}
+
+function closeProject() {
+  document.getElementById('overlay').classList.remove('on');
+  lockScroll(false);
+  if (lastFocused && lastFocused.focus) lastFocused.focus({ preventScroll: true });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeProject();
+    document.getElementById('bsod').classList.remove('on');
+    return;
+  }
+  const ov = document.getElementById('overlay');
+  if (!ov.classList.contains('on') || e.key !== 'Tab') return;
+
+  // фокус не должен выходить за пределы окна
+  const sel = 'a[href], button:not([disabled]), video, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  const items = [...ov.querySelectorAll(sel)].filter(el => el.offsetParent !== null);
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+
+  if (!ov.contains(document.activeElement)) {
+    e.preventDefault();
+    first.focus({ preventScroll: true });
+  } else if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus({ preventScroll: true });
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus({ preventScroll: true });
+  }
+});
+
+function bsod(){ document.getElementById('bsod').classList.add('on'); }
+
+// ── меню ──
+document.querySelectorAll('.menubar button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const act = btn.dataset.menu;
+    if (act === 'cv') {
+      window.open('assets/CV_Oleg_Sparber.pdf', '_blank');
+    } else if (act === 'projects') {
+      document.getElementById('icons-work')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (act === 'skills') {
+      document.getElementById('skills-window')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (act === 'help') {
+      bsod();
+    }
+  });
+});
+
+// ── ASCII-портрет с глитчем (донор: старый showcase, символы перебираются) ──
+const ASCII_ART = `                    =+*+**=
+                 +*%##%%%%####*
+               =*%%@@@%%%%@@@%%##+
+             +%%%@@@@@%##%%%%%%@@%+
+             *%%%%%%%#%%@@@@@@@@@%%+
+            +%@@@@%%%%@@@@@@@@@@@@#=
+            %@@@@@@%#%%%#*=---==*@@%%*
+           =%@@@%*+=----:::::---==%@@%=
+            @@@%*+==--::::::::---=+%%@*
+           =%%@#*==---::::::::---=+#%%*
+            #@%#*==---::::::::---=+#%%+
+           =#@%****###+=--=+*#***+=#%@#=
+           =%*#+*#%##*##-:=++##**+=*=#%+
+          =+@*#+++++===+-----===--===+%*
+          +#@+*+==----=+-----::---=+==%*=
+          +%@**#+==---+=::---::--=++=#%*=
+         =+%@@%#**+==+%@%#%*=---==+*@@%*+=
+          +#@@@%***%%%#***#####===*@@%%#*=
+         +#%@@@@#**++=+==----=+=++@@@@%%*+
+        +#*%%@@@@%#*++===---===+**@%@@%#*++
+        ++#%%@@@@#%%#*+=---==+##+=%@@%%%#*=
+        +*#%%@@@@###%%%#####%#+==*%@@@%%#*+=
+        +*#%%%@@@%**####**+++==-=%@@@@@%%***++
+       *+#%@@%@@@%*++**+=====---*#@%%@@@@%#**+=
+       *#%@@@%@%#%*+=++==------=##%%%%%@@%%#**
+      +#%%@@@@@*##*+==+=-------=###*%@@@@@@%**++
+    *##%@%@@@@#*=++++====------=+%#*##%@%@%#*+++++=
+ +####%%@@%%@#**=-====--==------=*+*%%%%@%#*+++++*=`;
+
+const ASCII_SETS = [
+  { main: '#@%*', alt: '&%$!' },
+  { main: '#@%*', alt: '^v<>' },
+  { main: '#@%*', alt: 'Oo0.' },
+  { main: '#@%*', alt: '+*/=' },
+  { main: '#@%*', alt: 'x%#+' }
+];
+
+const asciiEl = document.getElementById('ascii-art');
+if (asciiEl) {
+  let step = 0;
+  const paint = () => {
+    const set = ASCII_SETS[step % ASCII_SETS.length];
+    asciiEl.textContent = ASCII_ART.split('').map(ch => {
+      if (set.main.indexOf(ch) === -1) return ch;
+      return set.alt[Math.floor(Math.random() * set.alt.length)];
+    }).join('');
+    step++;
+  };
+  paint();
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) setInterval(paint, 450);
+}
+
+// ── Скрепыш ──
+const CLIPPY_LINES = [
+  'Похоже, вы ищете разработчика. Я знаю одного.',
+  'Хотите, я сделаю вид, что это работало ещё в демо?',
+  'Ваш проект не падал. Пока.',
+  'Могу добавить кнопку. Кнопки любят все.',
+  'Не просите ИИ «сделать красиво». Просите измеримо.',
+  'Я из 1997-го. Тогда всё работало без интернета.',
+  'Совет дня: бэкап не услуга, а страховка. Хотя кому я это говорю.',
+  'Если ИИ уверен на 100%, проверьте дважды.',
+  'Хотите, я помогу закрыть окно? Нет? Ладно, посижу.'
+];
+const clippyImg = document.getElementById('clippy-img');
+const clippySay = document.getElementById('clippy-say');
+if (clippyImg && clippySay) {
+  let ci = 0;
+
+  const narrow = window.matchMedia('(max-width:700px)');
+  let hideTimer = null;
+
+  const speak = (idx, animate) => {
+    clippySay.innerHTML = '<b>Скрепыш</b>' + CLIPPY_LINES[idx];
+    clippySay.classList.remove('mute');
+    if (animate) {
+      clippySay.classList.remove('speaking');
+      clippyImg.classList.remove('bob-fast');
+      void clippySay.offsetWidth;      // перезапуск анимации
+      clippySay.classList.add('speaking');
+      clippyImg.classList.add('bob-fast');
+    }
+    // на телефоне реплика не висит поверх карточек постоянно
+    clearTimeout(hideTimer);
+    if (narrow.matches) {
+      hideTimer = setTimeout(() => clippySay.classList.add('mute'), 7000);
+    }
+  };
+
+  clippyImg.addEventListener('click', () => {
+    ci = (ci + 1) % CLIPPY_LINES.length;
+    speak(ci, true);
+  });
+
+  // скрепыш сам меняет реплики, чтобы не молчал ни на десктопе, ни на телефоне
+  let nextLine = () => {
+    let n = ci;
+    while (n === ci && CLIPPY_LINES.length > 1) {
+      n = Math.floor(Math.random() * CLIPPY_LINES.length);
+    }
+    ci = n;
+    speak(ci, true);
+  };
+  speak(0, false);          // первая реплика тоже должна гаснуть на телефоне
+  setInterval(nextLine, 13000);
+  // и обязательно подаёт голос, когда вкладку вернули
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) nextLine();
+  });
+}
+
+// clock
+function tick(){
+  const d = new Date();
+  document.getElementById('clock').textContent =
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+tick(); setInterval(tick, 20000);
+
+// fake-but-honest visitor counter (localStorage, no tracking)
+(function(){
+  let n;
+  try {
+    n = parseInt(localStorage.getItem('olet_visits') || '1337', 10);
+    n += 1;
+    localStorage.setItem('olet_visits', String(n));
+  } catch(e) { n = 1337; }
+  document.getElementById('visits').textContent = 'Посетителей: ' + n.toLocaleString('ru-RU');
+})();
+</script>
+</body>
+</html>
