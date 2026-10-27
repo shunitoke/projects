@@ -83,7 +83,7 @@
     min-height: 0;
     background: #f4f4f4;
     margin: 1.2mm;
-    padding: 2mm 2.4mm 4mm;
+    padding: 2mm 2.4mm 2.4mm;
     border-top: 1px solid var(--shadow);
     border-left: 1px solid var(--shadow);
     border-right: 1px solid var(--light);
@@ -135,6 +135,7 @@
     font-weight: bold;
     width: 3.4mm;
     flex: 0 0 auto;
+    text-align: center;   /* @, ✈ и ⌂ разной ширины — центрируем в ячейке */
   }
   .line .v { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -155,18 +156,18 @@
 
   /* обратная сторона */
   .h {
-    font-size: 7pt;
+    font-size: 6.7pt;
     font-weight: bold;
     color: var(--navy);
     letter-spacing: .04em;
     margin-bottom: 1.2mm;
   }
-  .h:not(:first-child) { margin-top: 1.4mm; }
+  .h:not(:first-child) { margin-top: 1.1mm; }
 
-  ul.list { list-style: none; display: flex; flex-direction: column; gap: 0.4mm; }
+  ul.list { list-style: none; display: flex; flex-direction: column; gap: 0.25mm; }
   ul.list li {
-    font-size: 6.7pt;
-    line-height: 1.28;
+    font-size: 6.3pt;
+    line-height: 1.22;
     padding-left: 3mm;
     position: relative;
     color: #141414;
@@ -180,9 +181,10 @@
   }
 
   ol.steps { list-style: none; display: flex; flex-direction: column; gap: 0.35mm; counter-reset: s; }
+  ol.steps { gap: 0.25mm; }
   ol.steps li {
-    font-size: 6.4pt;
-    line-height: 1.25;
+    font-size: 6.1pt;
+    line-height: 1.22;
     padding-left: 3.6mm;
     position: relative;
     counter-increment: s;
@@ -198,8 +200,8 @@
 
   .foot {
     margin-top: auto;
-    padding-top: 1.6mm;
-    margin-bottom: 1.4mm;
+    padding-top: 1.2mm;
+    margin-bottom: 0.6mm;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -244,8 +246,8 @@
         <div class="role">инженер ИИ-систем</div>
         <div class="rule"></div>
         <div class="tagline">
-          Сайты, приложения, боты<br>
-          и интеграции, где ИИ<br>
+          Сайты · приложения · боты<br>
+          и интеграции. ИИ здесь<br>
           не выдумывает факты.
         </div>
         <div class="contacts">
