@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Наставник: соберём продукт без кода — Олег Шпарбер</title>
+<meta name="description" content="Соберём ваш продукт за 4 недели. Кода не пишем. Четыре встречи по два часа и чат между ними. На выходе — работающая штука в интернете.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Соберём ваш продукт за 4 недели. Кода не пишем">
+<meta property="og:description" content="Наставничество по вайбкодингу: 4 встречи по 2 часа, чат между ними, на выходе работающий сервис. Первым трём — 18 000 ₽ за отзыв.">
+<meta property="og:url" content="https://gigoctopus.ru/me/nastavnik.html">
+<meta property="og:image" content="https://gigoctopus.ru/me/assets/og-preview.jpg">
+<meta name="theme-color" content="#008080">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gray: #c0c0c0;
+    --light: #ffffff;
+    --shadow: #808080;
+    --ink: #000000;
+    --navy: #000080;
+    --teal: #008080;
+  }
+
+  html, body { overflow-x: hidden; }
+
+  body {
+    background: var(--teal);
+    font-family: 'Tahoma', 'DejaVu Sans', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink);
+    padding: 12px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .win {
+    max-width: 760px;
+    margin: 0 auto 14px;
+    background: var(--gray);
+    border-top: 2px solid var(--light);
+    border-left: 2px solid var(--light);
+    border-right: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .titlebar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--navy); color: #fff;
+    padding: 3px 5px; font-size: 12px; font-weight: bold;
+  }
+  .tbtns { display: flex; gap: 3px; }
+  .tb {
+    width: 15px; height: 14px; font-size: 10px; line-height: 12px;
+    background: var(--gray); color: var(--ink); font-weight: bold;
+    border-top: 1px solid var(--light); border-left: 1px solid var(--light);
+    border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+    cursor: default; text-align: center; font-family: inherit;
+  }
+
+  .body { padding: 10px; }
+
+  .inset {
+    background: #fff; padding: 16px 18px;
+    border-top: 1px solid var(--shadow); border-left: 1px solid var(--shadow);
+    border-right: 1px solid var(--light); border-bottom: 1px solid var(--light);
+  }
+
+  h1 {
+    font-size: 23px; line-height: 1.2; letter-spacing: -.3px;
+    margin-bottom: 10px;
+  }
+  h1 .no { color: var(--teal); }
+
+  .badge {
+    display: inline-block; margin-bottom: 11px; padding: 3px 8px;
+    background: var(--teal); color: #fff;
+    font-size: 11px; font-weight: bold; letter-spacing: .04em; text-transform: uppercase;
+  }
+
+  .lead { font-size: 15px; margin-bottom: 14px; color: #222; }
+
+  .facts {
+    display: flex; flex-direction: column; gap: 6px;
+    margin: 14px 0 16px;
+  }
+  .fact {
+    display: flex; gap: 9px; align-items: flex-start;
+    font-size: 13.5px; line-height: 1.4;
+  }
+  .fact b { color: var(--teal); flex: 0 0 auto; font-size: 13px; }
+
+  h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--navy); margin: 18px 0 8px;
+    padding-bottom: 3px; border-bottom: 1px solid #d8d8d8;
+  }
+  h2:first-of-type { margin-top: 6px; }
+
+  ul.list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  ul.list li {
+    font-size: 13.5px; line-height: 1.42; padding-left: 15px; position: relative;
+  }
+  ul.list li::before {
+    content: '>'; position: absolute; left: 0; color: var(--teal); font-weight: bold;
+  }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .cols .no li::before { content: '×'; color: #a00000; }
+
+  .price {
+    margin: 18px 0 0; padding: 12px 14px;
+    background: var(--gray);
+    border-top: 2px solid var(--shadow); border-left: 2px solid var(--shadow);
+    border-right: 2px solid var(--light); border-bottom: 2px solid var(--light);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .price .num { font-size: 25px; font-weight: bold; letter-spacing: -.5px; }
+  .price .num s { font-size: 14px; color: #555; font-weight: normal; margin-right: 6px; }
+  .price .note { font-size: 12px; color: #333; max-width: 320px; }
+
+  .cta-wrap { text-align: center; margin-top: 16px; }
+  .cta {
+    display: inline-block; text-align: center; text-decoration: none;
+    padding: 12px 26px;
+    background: var(--navy); color: #fff;
+    font-size: 16px; font-weight: bold; letter-spacing: .01em;
+    border-top: 2px solid #5a5ad0; border-left: 2px solid #5a5ad0;
+    border-right: 2px solid #000040; border-bottom: 2px solid #000040;
+    cursor: pointer;
+  }
+  .cta:hover { background: #0000a8; }
+  .cta:active {
+    border-top: 2px solid #000040; border-left: 2px solid #000040;
+    border-right: 2px solid #5a5ad0; border-bottom: 2px solid #5a5ad0;
+  }
+  .cta-note {
+    text-align: center; font-size: 12px; color: #444;
+    margin-top: 8px; line-height: 1.4;
+  }
+
+  .foot-note { font-size: 11.5px; color: #444; margin-top: 12px; }
+
+  .who {
+    margin-top: 14px; padding: 10px 12px; background: #f4f4f4;
+    border-left: 3px solid var(--teal); font-size: 13px; line-height: 1.45;
+  }
+  .who b { color: #111; }
+  .inset a:not(.cta) { color: var(--navy); text-decoration: underline; }
+  .inset a:not(.cta):hover { color: #0000c0; }
+
+  .links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .links a {
+    font-size: 12.5px; color: var(--navy); text-decoration: underline;
+  }
+
+  @media (max-width: 620px) {
+    body { padding: 6px; font-size: 13.5px; }
+    .body { padding: 6px; }
+    .inset { padding: 12px 12px; }
+    h1 { font-size: 19px; }
+    .lead { font-size: 14px; }
+    .cols { grid-template-columns: 1fr; gap: 4px; }
+    .price { flex-direction: column; align-items: flex-start; }
+    .price .num { font-size: 22px; }
+    .cta { display: block; font-size: 15px; padding: 13px 14px; }
+    .cta-wrap { margin-top: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="win">
+  <div class="titlebar">
+    <span>НАСТАВНИК.EXE — соберём продукт без кода</span>
+    <span class="tbtns"><button class="tb" aria-hidden="true">□</button><button class="tb" aria-hidden="true">×</button></span>
+  </div>
+  <div class="body">
+    <div class="inset">
+
+      <div class="badge">Наставничество · 4 недели · вы делаете руками, я страхую</div>
+
+      <h1>Соберём ваш продукт за 4 недели.<br><span class="no">Кода мы не напишем.</span></h1>
+
+      <p class="lead">
+        Не курс, не лекции и не «50 уроков в записи». Четыре встречи, между ними чат,
+        и на выходе — работающая штука в интернете, а не презентация.
+      </p>
+
+      <h2>Кто это делает</h2>
+      <div class="facts">
+        <div class="fact"><b>01</b><div>Я не программист. Ни строчки кода руками — всё собрано ИИ.</div></div>
+        <div class="fact"><b>02</b><div>Два приложения в <a href="https://www.rustore.ru/catalog/app/com.programma21.app" target="_blank" rel="noopener">RuStore</a>: трекер привычек с шифрованием и генератор решений.</div></div>
+        <div class="fact"><b>03</b><div>Живой <a href="https://lechill.ru/" target="_blank" rel="noopener">сайт салона</a> с онлайн-записью: клиенты пишутся сами, владелец правит контент без меня.</div></div>
+        <div class="fact"><b>04</b><div><a href="https://gigoctopus.ru/mini" target="_blank" rel="noopener">Афиша Петербурга</a>: 10 135 событий из 147 источников и 84 площадок, с проверкой каждого факта.</div></div>
+        <div class="fact"><b>05</b><div>За спиной 12 лет инфраструктуры: знаю, что встанет в проде, а что развалится на второй сотне пользователей.</div></div>
+      </div>
+
+      <h2>Что происходит за месяц</h2>
+      <ul class="list">
+        <li><b>Бриф на старте.</b> Разбираем идею и выкидываем половину: то, без чего продукт спокойно живёт.</li>
+        <li><b>Четыре встречи по 2 часа.</b> Каждую неделю собираем и запускаем очередной кусок — не «изучаем инструмент», а двигаем продукт.</li>
+        <li><b>Чат между встречами.</b> Застряли — пишете, разбираемся в тот же день.</li>
+        <li><b>Вы делаете руками.</b> Я показываю и страхую. Это главное: продукт должен остаться вашим, а не моим.</li>
+      </ul>
+
+      <h2>Что на выходе</h2>
+      <ul class="list">
+        <li>Работающий сервис на своём адресе, открывается у людей, а не только у вас.</li>
+        <li>Понимание, как его менять самому — без меня и без подрядчика на каждую кнопку.</li>
+        <li>Список грабель: где ИИ врёт, что ломается на мобильных, где счёт за API вырастает в десять раз.</li>
+      </ul>
+
+      <h2>Кому подойдёт</h2>
+      <div class="cols">
+        <div>
+          <ul class="list">
+            <li>Есть идея сервиса и нет команды.</li>
+            <li>Нужен внутренний инструмент для своей работы: учёт, отчёты, автоматизация рутины.</li>
+            <li>Хотите проверить нишу, не нанимая разработчика.</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="list no">
+            <li>Хотите стать разработчиком и ищете профессию — это не сюда.</li>
+            <li>Нужен исполнитель, который сделает всё за вас.</li>
+            <li>Enterprise с отделом безопасности и согласованиями на полгода.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="price">
+        <div class="num"><s>30 000 ₽</s>18 000 ₽</div>
+        <div class="note">
+          Первым трём — 18 000 ₽ за месяц в обмен на честный отзыв.
+          Дальше 30 000 ₽. Оплата в начале месяца.
+        </div>
+      </div>
+
+      <div class="cta-wrap">
+        <a class="cta" href="https://t.me/osparber" target="_blank" rel="noopener">→ Написать @osparber в Telegram</a>
+      </div>
+      <p class="cta-note">
+        Демо на 40 минут, бесплатно. Включаем экран и вместе собираем прототип вашей идеи —
+        видно сразу, попал я или нет.
+      </p>
+
+      <div class="who">
+        <b>Олег Шпарбер</b>, инженер ИИ-систем. Петербург, работаю удалённо.
+        Telegram <b>@osparber</b>, почта <b>shunitoke@gmail.com</b>.
+      </div>
+
+      <div class="links">
+        <a href="https://gigoctopus.ru/me/" target="_blank" rel="noopener">Портфолио</a>
+        <a href="https://gigoctopus.ru/me/assets/CV_Oleg_Sparber.pdf" target="_blank" rel="noopener">Резюме в PDF</a>
+        <a href="https://www.rustore.ru/catalog/app/com.programma21.app" target="_blank" rel="noopener">Программа 21 в RuStore</a>
+      </div>
+
+      <p class="foot-note">
+        Демо ни к чему не обязывает. Если по ходу разговора станет ясно, что вам нужен не наставник,
+        а исполнитель — я так и скажу.
+      </p>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
